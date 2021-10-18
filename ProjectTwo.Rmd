@@ -1,0 +1,22 @@
+---
+title: "ProjectTwo"
+author: "Maks Nikiforov and Mark Austin"
+date: "Due 10/31/2021"
+---
+
+
+```{r image setup, include=FALSE}
+knitr::opts_chunk$set(fig.path = "images/")
+```
+
+
+
+```{r load packages,message=FALSE,echo=FALSE}
+   library(tidyverse)
+   library(caret)
+   library(knitr)
+```
+
+
+
+
