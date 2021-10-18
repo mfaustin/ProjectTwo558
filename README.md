@@ -13,6 +13,8 @@ project and/or create this document.
 
 -   `tidyverse` The tidyverse package is used for data handling and
     plotting.
+    
+-   `caret` The caret package is used for working with data and models.    
 
 -   `knitr` The knitr package is used for document image handling.
 
