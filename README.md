@@ -3,7 +3,7 @@ Project Two
 Maksim Nikiforov and Mark Austin
 
 
-## Introduction
+## Purpose
 
 
 ## Required R Packages
@@ -21,3 +21,9 @@ project and/or create this document.
 -   `rmarkdown` The rmarkdown package is used by a render program to
     render this document.
     
+
+## Analyses
+
+
+## Render Code Used to Create Analyses
+
