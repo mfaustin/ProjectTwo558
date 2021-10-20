@@ -2,6 +2,8 @@
 title: "ProjectTwo"
 author: "Maks Nikiforov and Mark Austin"
 date: "Due 10/31/2021"
+params: 
+      channel: ""
 ---
 
 
@@ -16,6 +18,44 @@ knitr::opts_chunk$set(fig.path = "images/")
    library(caret)
    library(knitr)
 ```
+
+## Introduction  
+
+
+## Data  
+
+
+```{r import data, message=FALSE}
+
+
+fullData<-read_csv("./data/OnlineNewsPopularity.csv")
+
+
+```
+
+Using `r params$channel`
+
+```{r subset for channel}
+
+params$channel
+
+```
+
+
+## Summarizations  
+
+
+
+
+## Modeling  
+
+
+
+
+## Comparisions  
+
+
+
 
 
 
