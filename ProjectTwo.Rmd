@@ -1,5 +1,4 @@
 ---
-title: "Channel Analysis"
 author: "Maks Nikiforov and Mark Austin"
 date: "Due 10/31/2021"
 params: 
@@ -35,8 +34,10 @@ if (params$channel=="data_channel_is_bus") {
 
 ```
 
+---
+title: "Analysis for the `r currentChannel` Channel"
+---
 
-**Analysis for the `r currentChannel` Channel**  
 
 
 ```{r load packages,message=FALSE,echo=FALSE}
@@ -82,7 +83,7 @@ str(channelData)
 ```{r graphOneA}
 ##For now this is just a test graph to test out automation
 g<-ggplot(data = channelData,
-          aes(x=rate_positive_words,y=self_reference_avg_sharess))
+          aes(x=rate_positive_words,y=shares))
 g + geom_point()
 
 ```

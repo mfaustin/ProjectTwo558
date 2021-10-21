@@ -1,4 +1,4 @@
-Channel Analysis
+Analysis for the Business Channel
 ================
 Maks Nikiforov and Mark Austin
 Due 10/31/2021
@@ -8,8 +8,6 @@ Due 10/31/2021
 -   [Summarizations](#summarizations)
 -   [Modeling](#modeling)
 -   [Model Comparisions](#model-comparisions)
-
-**Analysis for the Business Channel**
 
 ## Introduction
 
@@ -171,7 +169,7 @@ str(channelData)
 ``` r
 ##For now this is just a test graph to test out automation
 g<-ggplot(data = channelData,
-          aes(x=rate_positive_words,y=self_reference_avg_sharess))
+          aes(x=rate_positive_words,y=shares))
 g + geom_point()
 ```
 
