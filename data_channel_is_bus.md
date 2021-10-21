@@ -7,7 +7,7 @@ Due 10/31/2021
 -   [Data](#data)
 -   [Summarizations](#summarizations)
 -   [Modeling](#modeling)
--   [Comparisions](#comparisions)
+-   [Model Comparisions](#model-comparisions)
 
 ## Introduction
 
@@ -168,4 +168,4 @@ str(channelData)
 
 ## Modeling
 
-## Comparisions
+## Model Comparisions

@@ -24,6 +24,7 @@ project and/or create this document.
 
 ## Analyses
 
+[Lifestyle articles is available here](data_channel_is_lifestyle.html)  
 
 ## Render Code Used to Create Analyses
 
