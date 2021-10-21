@@ -39,6 +39,14 @@ Using `r params$channel`
 
 params$channel
 
+
+channelData<-fullData %>% filter(eval(as.name(params$channel))==1) 
+
+##test code to confirm by str the filter is as expected
+str(channelData)
+
+###Need to drop other channel variables??
+
 ```
 
 
