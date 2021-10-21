@@ -5,7 +5,7 @@ Maks Nikiforov and Mark Austin
 
 ## Purpose
 
-This repository contains files needed for analysis of an [Online News Popularity](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) data set.  ProjectTwo.R contains render code that works with input file ProjectTwo.Rmd to produce different github document files for each of the 6 channels.  Data summaries and modeling are presented for each channel.  
+This repository contains files needed for analysis of an [Online News Popularity](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) data set.  renderProjectTwo.R contains render code that works with input file ProjectTwo.Rmd to produce different github document files for each of the 6 channels.  Data summaries and modeling are presented for each channel.  
 
 Github pages is enabled to allow viewing the channel analysis pages as linked html files.  
 
