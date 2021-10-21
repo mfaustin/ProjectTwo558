@@ -1,5 +1,5 @@
 ---
-title: "ProjectTwo"
+title: "Channel Analysis"
 author: "Maks Nikiforov and Mark Austin"
 date: "Due 10/31/2021"
 params: 
@@ -11,23 +11,32 @@ params:
 
 ##For markdown automation need a different image folder 
 ##  for each of the 6 channels
+##Also setting up currentChannel variable 
 if (params$channel=="data_channel_is_bus") {
   knitr::opts_chunk$set(fig.path = "images/bus/")
+  currentChannel<-"Business"
 } else if (params$channel=="data_channel_is_entertainment") {
   knitr::opts_chunk$set(fig.path = "images/entertainment/")
+  currentChannel<-"Entertainment"
 } else if (params$channel=="data_channel_is_lifestyle") {
   knitr::opts_chunk$set(fig.path = "images/lifestyle/")
+  currentChannel<-"Lifestyle"
 } else if (params$channel=="data_channel_is_socmed") {
   knitr::opts_chunk$set(fig.path = "images/socmed/")
+  currentChannel<-"Social Media"
 } else if (params$channel=="data_channel_is_tech") {
   knitr::opts_chunk$set(fig.path = "images/tech/")
+  currentChannel<-"Tech"
 } else if (params$channel=="data_channel_is_world") {
   knitr::opts_chunk$set(fig.path = "images/world/")
+  currentChannel<-"World"
 } 
 #knitr::opts_chunk$set(fig.path = "images/")
 
 ```
 
+
+**Analysis for the `r currentChannel` Channel**  
 
 
 ```{r load packages,message=FALSE,echo=FALSE}

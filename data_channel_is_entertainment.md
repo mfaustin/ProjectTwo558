@@ -1,4 +1,4 @@
-ProjectTwo
+Channel Analysis
 ================
 Maks Nikiforov and Mark Austin
 Due 10/31/2021
@@ -8,6 +8,8 @@ Due 10/31/2021
 -   [Summarizations](#summarizations)
 -   [Modeling](#modeling)
 -   [Model Comparisions](#model-comparisions)
+
+**Analysis for the Entertainment Channel**
 
 ## Introduction
 
