@@ -85,13 +85,6 @@ g + geom_point() +
 ###I'm still working no this plot
 
 ###creating histogram of shares data 
-summary(channelData$shares)
-```
-
-    ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-    ##      1.0    952.2   1400.0   3063.0   2500.0 690400.0
-
-``` r
 g <- ggplot(channelData, aes( x = shares))
 g + geom_histogram(binwidth=12000,color = "brown", fill = "green", 
   size = 1)  + labs(x="Shares", y="Count",
