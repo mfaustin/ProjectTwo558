@@ -166,6 +166,19 @@ str(channelData)
 
 ## Summarizations
 
+``` r
+##For now this is just a test graph to test out automation
+g<-ggplot(data = channelData,
+          aes(x=rate_positive_words,y=self_reference_avg_sharess))
+g + geom_point()
+```
+
+![](images/tech/graphOneA-1.png)<!-- -->
+
 ## Modeling
+
+``` r
+#Using set.seed per suggestion so that work will be reproducible
+```
 
 ## Model Comparisions

@@ -8,7 +8,29 @@ params:
 
 
 ```{r image setup, include=FALSE}
-knitr::opts_chunk$set(fig.path = "images/")
+
+##For markdown automation need a different image folder 
+##  for each of the 6 channels
+if (params$channel=="data_channel_is_bus") {
+  knitr::opts_chunk$set(fig.path = "images/bus/")
+} 
+if (params$channel=="data_channel_is_entertainment") {
+  knitr::opts_chunk$set(fig.path = "images/entertainment/")
+} 
+if (params$channel=="data_channel_is_lifestyle") {
+  knitr::opts_chunk$set(fig.path = "images/lifestyle/")
+} 
+if (params$channel=="data_channel_is_socmed") {
+  knitr::opts_chunk$set(fig.path = "images/socmed/")
+} 
+if (params$channel=="data_channel_is_tech") {
+  knitr::opts_chunk$set(fig.path = "images/tech/")
+} 
+if (params$channel=="data_channel_is_world") {
+  knitr::opts_chunk$set(fig.path = "images/world/")
+} 
+#knitr::opts_chunk$set(fig.path = "images/")
+
 ```
 
 
@@ -53,6 +75,13 @@ str(channelData)
 ## Summarizations  
 
 
+```{r graphOneA}
+##For now this is just a test graph to test out automation
+g<-ggplot(data = channelData,
+          aes(x=rate_positive_words,y=self_reference_avg_sharess))
+g + geom_point()
+
+```
 
 
 ## Modeling  
@@ -70,7 +99,7 @@ str(channelData)
 ```
 
 
-```{r train linear regression model one}
+```{r train linear regression model two}
 
 ```
 
@@ -94,7 +123,7 @@ str(channelData)
 ```
 
 
-```{r test linear regression model one}
+```{r test linear regression model two}
 
 ```
 
