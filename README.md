@@ -22,11 +22,21 @@ project and/or create this document.
     render this document.
     
 
-## Analyses
+## Analyses by Channel  
 
+[Business articles is available here](data_channel_is_bus.html)  
+
+[Entertainment articles is available here](data_channel_is_entertainment.html)  
 [Lifestyle articles is available here](data_channel_is_lifestyle.html)  
 
-## Render Code Used to Create Analyses
+[Social Media articles is available here](data_channel_is_socmed.html)  
+
+[Tech articles is available here](data_channel_is_tech.html)  
+
+[World articles is available here](data_channel_is_world.html)  
+
+
+## Render Code Used to Create Analyses  
 
 ``` r
 library(tidyverse)
