@@ -13,20 +13,15 @@ params:
 ##  for each of the 6 channels
 if (params$channel=="data_channel_is_bus") {
   knitr::opts_chunk$set(fig.path = "images/bus/")
-} 
-if (params$channel=="data_channel_is_entertainment") {
+} else if (params$channel=="data_channel_is_entertainment") {
   knitr::opts_chunk$set(fig.path = "images/entertainment/")
-} 
-if (params$channel=="data_channel_is_lifestyle") {
+} else if (params$channel=="data_channel_is_lifestyle") {
   knitr::opts_chunk$set(fig.path = "images/lifestyle/")
-} 
-if (params$channel=="data_channel_is_socmed") {
+} else if (params$channel=="data_channel_is_socmed") {
   knitr::opts_chunk$set(fig.path = "images/socmed/")
-} 
-if (params$channel=="data_channel_is_tech") {
+} else if (params$channel=="data_channel_is_tech") {
   knitr::opts_chunk$set(fig.path = "images/tech/")
-} 
-if (params$channel=="data_channel_is_world") {
+} else if (params$channel=="data_channel_is_world") {
   knitr::opts_chunk$set(fig.path = "images/world/")
 } 
 #knitr::opts_chunk$set(fig.path = "images/")
