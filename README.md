@@ -27,6 +27,7 @@ project and/or create this document.
 [Business articles is available here](data_channel_is_bus.html)  
 
 [Entertainment articles is available here](data_channel_is_entertainment.html)   
+  
 [Lifestyle articles is available here](data_channel_is_lifestyle.html)  
 
 [Social Media articles is available here](data_channel_is_socmed.html)  
