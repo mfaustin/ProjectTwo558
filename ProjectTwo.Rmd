@@ -57,12 +57,56 @@ str(channelData)
 
 ## Modeling  
 
+```{r splitting data}
+
+#Using set.seed per suggestion so that work will be reproducible
+
+
+```
+
+
+```{r train linear regression model one}
+
+```
+
+
+```{r train linear regression model one}
+
+```
+
+
+```{r train random forest model}
+
+```
+
+
+```{r train boosted tree model}
+
+```
+
+
+## Model Comparisions  
 
 
 
-## Comparisions  
+```{r test linear regression model one}
+
+```
 
 
+```{r test linear regression model one}
+
+```
+
+
+```{r test random forest model}
+
+```
+
+
+```{r test boosted tree model}
+
+```
 
 
 
