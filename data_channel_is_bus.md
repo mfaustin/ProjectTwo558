@@ -4,181 +4,116 @@ Maks Nikiforov and Mark Austin
 Due 10/31/2021
 
 -   [Introduction](#introduction)
--   [Data](#data)
+-   [Import and Prepare Data](#import-and-prepare-data)
 -   [Summarizations](#summarizations)
+    -   [Numerical Summaries](#numerical-summaries)
+    -   [Contingency Tables](#contingency-tables)
+    -   [Plots](#plots)
 -   [Modeling](#modeling)
 -   [Model Comparisions](#model-comparisions)
 
 ## Introduction
 
-## Data
+## Import and Prepare Data
+
+We begin by reading all data into a tibble using `readcsv`.
 
 ``` r
 fullData<-read_csv("./data/OnlineNewsPopularity.csv")
 ```
 
-Using data\_channel\_is\_bus
+The [data
+documentation](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity)
+says variables url and timedelta are nonpredictive so these can be
+removed.
 
 ``` r
-params$channel
+reduceVarsData<-fullData %>% select(-url,-timedelta)
+
+#Are there other vars we do not need to use??
 ```
 
-    ## [1] "data_channel_is_bus"
-
 ``` r
-channelData<-fullData %>% filter(eval(as.name(params$channel))==1) 
+#test code to be removed later
+#params$channel<-"data_channel_is_bus"
 
-##test code to confirm by str the filter is as expected
-str(channelData)
-```
+#filter by the current params channel
+channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
 
-    ## spec_tbl_df [6,258 x 61] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
-    ##  $ url                          : chr [1:6258] "http://mashable.com/2013/01/07/ap-samsung-sponsored-tweets/" "http://mashable.com/2013/01/07/apple-40-billion-app-downloads/" "http://mashable.com/2013/01/07/entrepreneur-trends-2013/" "http://mashable.com/2013/01/07/htc-q1/" ...
-    ##  $ timedelta                    : num [1:6258] 731 731 731 731 731 731 731 731 731 730 ...
-    ##  $ n_tokens_title               : num [1:6258] 9 9 8 13 11 8 10 12 6 13 ...
-    ##  $ n_tokens_content             : num [1:6258] 255 211 397 244 723 708 142 444 109 306 ...
-    ##  $ n_unique_tokens              : num [1:6258] 0.605 0.575 0.625 0.56 0.491 ...
-    ##  $ n_non_stop_words             : num [1:6258] 1 1 1 1 1 ...
-    ##  $ n_non_stop_unique_tokens     : num [1:6258] 0.792 0.664 0.806 0.68 0.642 ...
-    ##  $ num_hrefs                    : num [1:6258] 3 3 11 3 18 8 2 9 3 3 ...
-    ##  $ num_self_hrefs               : num [1:6258] 1 1 0 2 1 3 1 8 2 2 ...
-    ##  $ num_imgs                     : num [1:6258] 1 1 1 1 1 1 1 23 1 1 ...
-    ##  $ num_videos                   : num [1:6258] 0 0 0 0 0 1 0 0 0 0 ...
-    ##  $ average_token_length         : num [1:6258] 4.91 4.39 5.45 4.42 5.23 ...
-    ##  $ num_keywords                 : num [1:6258] 4 6 6 4 6 7 5 10 6 10 ...
-    ##  $ data_channel_is_lifestyle    : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ data_channel_is_entertainment: num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ data_channel_is_bus          : num [1:6258] 1 1 1 1 1 1 1 1 1 1 ...
-    ##  $ data_channel_is_socmed       : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ data_channel_is_tech         : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ data_channel_is_world        : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ kw_min_min                   : num [1:6258] 0 0 0 0 0 0 0 0 0 217 ...
-    ##  $ kw_max_min                   : num [1:6258] 0 0 0 0 0 0 0 0 0 5700 ...
-    ##  $ kw_avg_min                   : num [1:6258] 0 0 0 0 0 ...
-    ##  $ kw_min_max                   : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ kw_max_max                   : num [1:6258] 0 0 0 0 0 0 0 0 0 17100 ...
-    ##  $ kw_avg_max                   : num [1:6258] 0 0 0 0 0 ...
-    ##  $ kw_min_avg                   : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ kw_max_avg                   : num [1:6258] 0 0 0 0 0 0 0 0 0 5700 ...
-    ##  $ kw_avg_avg                   : num [1:6258] 0 0 0 0 0 ...
-    ##  $ self_reference_min_shares    : num [1:6258] 0 918 0 2800 0 6100 0 585 821 0 ...
-    ##  $ self_reference_max_shares    : num [1:6258] 0 918 0 2800 0 6100 0 1600 821 0 ...
-    ##  $ self_reference_avg_sharess   : num [1:6258] 0 918 0 2800 0 ...
-    ##  $ weekday_is_monday            : num [1:6258] 1 1 1 1 1 1 1 1 1 0 ...
-    ##  $ weekday_is_tuesday           : num [1:6258] 0 0 0 0 0 0 0 0 0 1 ...
-    ##  $ weekday_is_wednesday         : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ weekday_is_thursday          : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ weekday_is_friday            : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ weekday_is_saturday          : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ weekday_is_sunday            : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ is_weekend                   : num [1:6258] 0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ LDA_00                       : num [1:6258] 0.8 0.218 0.867 0.3 0.867 ...
-    ##  $ LDA_01                       : num [1:6258] 0.05 0.0333 0.0333 0.05 0.0333 ...
-    ##  $ LDA_02                       : num [1:6258] 0.0501 0.0334 0.0333 0.05 0.0333 ...
-    ##  $ LDA_03                       : num [1:6258] 0.0501 0.0333 0.0333 0.05 0.0333 ...
-    ##  $ LDA_04                       : num [1:6258] 0.05 0.6822 0.0333 0.5497 0.0333 ...
-    ##  $ global_subjectivity          : num [1:6258] 0.341 0.702 0.374 0.332 0.375 ...
-    ##  $ global_sentiment_polarity    : num [1:6258] 0.1489 0.3233 0.2125 -0.0923 0.1827 ...
-    ##  $ global_rate_positive_words   : num [1:6258] 0.0431 0.0569 0.0655 0.0164 0.0636 ...
-    ##  $ global_rate_negative_words   : num [1:6258] 0.01569 0.00948 0.01008 0.02459 0.0083 ...
-    ##  $ rate_positive_words          : num [1:6258] 0.733 0.857 0.867 0.4 0.885 ...
-    ##  $ rate_negative_words          : num [1:6258] 0.267 0.143 0.133 0.6 0.115 ...
-    ##  $ avg_positive_polarity        : num [1:6258] 0.287 0.496 0.382 0.292 0.341 ...
-    ##  $ min_positive_polarity        : num [1:6258] 0.0333 0.1 0.0333 0.1364 0.0333 ...
-    ##  $ max_positive_polarity        : num [1:6258] 0.7 1 1 0.433 1 ...
-    ##  $ avg_negative_polarity        : num [1:6258] -0.119 -0.467 -0.145 -0.456 -0.214 ...
-    ##  $ min_negative_polarity        : num [1:6258] -0.125 -0.8 -0.2 -1 -0.6 -0.5 -0.3 0 -0.1 0 ...
-    ##  $ max_negative_polarity        : num [1:6258] -0.1 -0.133 -0.1 -0.125 -0.1 ...
-    ##  $ title_subjectivity           : num [1:6258] 0 0 0 0.7 0.5 ...
-    ##  $ title_sentiment_polarity     : num [1:6258] 0 0 0 -0.4 0.5 ...
-    ##  $ abs_title_subjectivity       : num [1:6258] 0.5 0.5 0.5 0.2 0 ...
-    ##  $ abs_title_sentiment_polarity : num [1:6258] 0 0 0 0.4 0.5 ...
-    ##  $ shares                       : num [1:6258] 711 1500 3100 852 425 3200 575 819 732 1200 ...
-    ##  - attr(*, "spec")=
-    ##   .. cols(
-    ##   ..   url = col_character(),
-    ##   ..   timedelta = col_double(),
-    ##   ..   n_tokens_title = col_double(),
-    ##   ..   n_tokens_content = col_double(),
-    ##   ..   n_unique_tokens = col_double(),
-    ##   ..   n_non_stop_words = col_double(),
-    ##   ..   n_non_stop_unique_tokens = col_double(),
-    ##   ..   num_hrefs = col_double(),
-    ##   ..   num_self_hrefs = col_double(),
-    ##   ..   num_imgs = col_double(),
-    ##   ..   num_videos = col_double(),
-    ##   ..   average_token_length = col_double(),
-    ##   ..   num_keywords = col_double(),
-    ##   ..   data_channel_is_lifestyle = col_double(),
-    ##   ..   data_channel_is_entertainment = col_double(),
-    ##   ..   data_channel_is_bus = col_double(),
-    ##   ..   data_channel_is_socmed = col_double(),
-    ##   ..   data_channel_is_tech = col_double(),
-    ##   ..   data_channel_is_world = col_double(),
-    ##   ..   kw_min_min = col_double(),
-    ##   ..   kw_max_min = col_double(),
-    ##   ..   kw_avg_min = col_double(),
-    ##   ..   kw_min_max = col_double(),
-    ##   ..   kw_max_max = col_double(),
-    ##   ..   kw_avg_max = col_double(),
-    ##   ..   kw_min_avg = col_double(),
-    ##   ..   kw_max_avg = col_double(),
-    ##   ..   kw_avg_avg = col_double(),
-    ##   ..   self_reference_min_shares = col_double(),
-    ##   ..   self_reference_max_shares = col_double(),
-    ##   ..   self_reference_avg_sharess = col_double(),
-    ##   ..   weekday_is_monday = col_double(),
-    ##   ..   weekday_is_tuesday = col_double(),
-    ##   ..   weekday_is_wednesday = col_double(),
-    ##   ..   weekday_is_thursday = col_double(),
-    ##   ..   weekday_is_friday = col_double(),
-    ##   ..   weekday_is_saturday = col_double(),
-    ##   ..   weekday_is_sunday = col_double(),
-    ##   ..   is_weekend = col_double(),
-    ##   ..   LDA_00 = col_double(),
-    ##   ..   LDA_01 = col_double(),
-    ##   ..   LDA_02 = col_double(),
-    ##   ..   LDA_03 = col_double(),
-    ##   ..   LDA_04 = col_double(),
-    ##   ..   global_subjectivity = col_double(),
-    ##   ..   global_sentiment_polarity = col_double(),
-    ##   ..   global_rate_positive_words = col_double(),
-    ##   ..   global_rate_negative_words = col_double(),
-    ##   ..   rate_positive_words = col_double(),
-    ##   ..   rate_negative_words = col_double(),
-    ##   ..   avg_positive_polarity = col_double(),
-    ##   ..   min_positive_polarity = col_double(),
-    ##   ..   max_positive_polarity = col_double(),
-    ##   ..   avg_negative_polarity = col_double(),
-    ##   ..   min_negative_polarity = col_double(),
-    ##   ..   max_negative_polarity = col_double(),
-    ##   ..   title_subjectivity = col_double(),
-    ##   ..   title_sentiment_polarity = col_double(),
-    ##   ..   abs_title_subjectivity = col_double(),
-    ##   ..   abs_title_sentiment_polarity = col_double(),
-    ##   ..   shares = col_double()
-    ##   .. )
-    ##  - attr(*, "problems")=<externalptr>
-
-``` r
-###Need to drop other channel variables??
+###Can now drop the data channel variables 
+channelData<-channelData %>% select(-starts_with("data_channel"))
 ```
 
 ## Summarizations
+
+### Numerical Summaries
+
+Summary information for shares. This gives an idea of the center and
+spread for shares.
+
+``` r
+channelData %>% 
+  summarise(Avg = mean(shares), Sd = sd(shares), 
+    Median = median(shares), IQR =IQR(shares)) %>% kable(caption = "Summary Statistics for Shares")
+```
+
+|      Avg |       Sd | Median |     IQR |
+|---------:|---------:|-------:|--------:|
+| 3063.019 | 15046.39 |   1400 | 1547.75 |
+
+Summary Statistics for Shares
+
+### Contingency Tables
+
+``` r
+##I want to try and split up shares then create a contingency table
+```
+
+### Plots
 
 ``` r
 ##For now this is just a test graph to test out automation
 g<-ggplot(data = channelData,
           aes(x=rate_positive_words,y=shares))
-g + geom_point()
+g + geom_point() +
+  scale_y_continuous(labels = scales::comma) 
 ```
 
 ![](images/bus/graphOneA-1.png)<!-- -->
+
+``` r
+###I'm still working no this plot
+
+###creating histogram of shares data 
+summary(channelData$shares)
+```
+
+    ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+    ##      1.0    952.2   1400.0   3063.0   2500.0 690400.0
+
+``` r
+g <- ggplot(channelData, aes( x = shares))
+g + geom_histogram(binwidth=12000,color = "brown", fill = "green", 
+  size = 1)  + labs(x="Shares", y="Count",
+  title = "Histogram Shares Counts") +
+  scale_x_continuous(labels = scales::comma) 
+```
+
+![](images/bus/histogram%20of%20shares-1.png)<!-- -->
 
 ## Modeling
 
 ``` r
 #Using set.seed per suggestion so that work will be reproducible
+set.seed(20)
+
+dataIndex <-createDataPartition(channelData$shares, p = 0.7, list = FALSE)
+
+channelTrain <-channelData[dataIndex,]
+channelTest <-channelData[-dataIndex,]
 ```
 
 ## Model Comparisions
+
+This part needs to be automated. Maybe create a function and iterate
+over these if they are similar?

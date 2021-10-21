@@ -49,8 +49,9 @@ title: "Analysis for the `r currentChannel` Channel"
 ## Introduction  
 
 
-## Data  
+## Import and Prepare Data  
 
+We begin by reading all data into a tibble using `readcsv`.  
 
 ```{r import data, message=FALSE}
 
@@ -60,19 +61,30 @@ fullData<-read_csv("./data/OnlineNewsPopularity.csv")
 
 ```
 
-Using `r params$channel`
+
+The [data documentation](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) says variables url and timedelta are nonpredictive so these can be removed.  
+
+```{r remove unused variables}
+
+reduceVarsData<-fullData %>% select(-url,-timedelta)
+
+#Are there other vars we do not need to use??
+
+```
+
+
 
 ```{r subset for channel}
 
-params$channel
+#test code to be removed later
+#params$channel<-"data_channel_is_bus"
 
+#filter by the current params channel
+channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
 
-channelData<-fullData %>% filter(eval(as.name(params$channel))==1) 
+###Can now drop the data channel variables 
+channelData<-channelData %>% select(-starts_with("data_channel"))
 
-##test code to confirm by str the filter is as expected
-str(channelData)
-
-###Need to drop other channel variables??
 
 ```
 
@@ -80,13 +92,53 @@ str(channelData)
 ## Summarizations  
 
 
+### Numerical Summaries  
+
+Summary information for shares.  This gives an idea of the center and spread for shares.  
+
+```{r shares summary}
+channelData %>% 
+  summarise(Avg = mean(shares), Sd = sd(shares), 
+    Median = median(shares), IQR =IQR(shares)) %>% kable(caption = "Summary Statistics for Shares")
+```
+
+
+### Contingency Tables  
+
+
+```{r shares by size}
+##I want to try and split up shares then create a contingency table
+
+
+```
+
+
+### Plots  
+
 ```{r graphOneA}
 ##For now this is just a test graph to test out automation
 g<-ggplot(data = channelData,
           aes(x=rate_positive_words,y=shares))
-g + geom_point()
+g + geom_point() +
+  scale_y_continuous(labels = scales::comma) 
 
 ```
+
+
+```{r histogram of shares}
+
+###I'm still working no this plot
+
+###creating histogram of shares data 
+summary(channelData$shares)
+g <- ggplot(channelData, aes( x = shares))
+g + geom_histogram(binwidth=12000,color = "brown", fill = "green", 
+  size = 1)  + labs(x="Shares", y="Count",
+  title = "Histogram Shares Counts") +
+  scale_x_continuous(labels = scales::comma) 
+
+```
+
 
 
 ## Modeling  
@@ -94,7 +146,12 @@ g + geom_point()
 ```{r splitting data}
 
 #Using set.seed per suggestion so that work will be reproducible
+set.seed(20)
 
+dataIndex <-createDataPartition(channelData$shares, p = 0.7, list = FALSE)
+
+channelTrain <-channelData[dataIndex,]
+channelTest <-channelData[-dataIndex,]
 
 ```
 
@@ -121,7 +178,7 @@ g + geom_point()
 
 ## Model Comparisions  
 
-
+This part needs to be automated.  Maybe create a function and iterate over these if they are similar?
 
 ```{r test linear regression model one}
 
