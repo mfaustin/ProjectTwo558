@@ -105,7 +105,7 @@ channelData<-channelData %>% select(-starts_with("data_channel"))
 
 ### Numerical Summaries  
 
-Summary information for shares.  This gives an idea of the center and spread for shares.  
+Summary information for shares grouped by whether an article was a weekend article or not..  This gives an idea of the center and spread for shares.  
 
 ```{r shares summary}
 channelData %>% group_by(is_weekend) %>% 
@@ -130,8 +130,10 @@ channelData %>% group_by(is_weekend) %>%
 
 ###this one is in progress, hopefully a scatter plot
 g<-ggplot(data = channelData,
-          aes(x= n_tokens_content,y=shares))
+          aes(x= avg_negative_polarity,y=shares))
 g + geom_point(aes(color=as.factor(is_weekend))) +
+  scale_y_continuous(trans = "pseudo_log")
+  
   scale_y_continuous(labels = scales::comma) 
 
 
