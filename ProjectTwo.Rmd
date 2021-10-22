@@ -85,18 +85,6 @@ channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1)
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
 
-# # Dichotomize popularity of articles based on median number of shares
-# channelData %>% mutate(popular = NA)
-# 
-# for (i in 1:length(channelData)) {
-#   if (channelData$shares[i] >= median(channelData$shares)) {
-#     channelData$popular[i] = 1
-#   }
-#     else {
-#       channelData$popular[i] = 0
-#     }
-#   }
-
 ```
 
 
@@ -195,8 +183,6 @@ weekdayBar + labs(x = "Day", y = "Number published",
 #Using set.seed per suggestion so that work will be reproducible
 set.seed(20)
 
-channelData$popular <- as.factor(channelData$popular)
-
 dataIndex <-createDataPartition(channelData$shares, p = 0.7, list = FALSE)
 
 channelTrain <-channelData[dataIndex,]
@@ -248,20 +234,35 @@ rfFit
 # nTrees <- c(10, 20, 50, 100, 200, 400)
 # interactionDepth = 1:4
 # neighbors = c(1, 3, 5, 10, 20)
-# 
-# set.seed(20)
-# # Boosted tree fit
-# boostedTreeFit <- train(popular ~ ., data = channelTrain,
+
+
+# Seeing "Error in summary.connection(connection) : invalid connection"
+# if I don't re-allocate cores for parallel computing
+cl <- makePSOCKcluster(6)
+registerDoParallel(cl)
+
+# Boosted tree fit with tuneGrid (specific parameters)
+# boostedTreeFit <- train(shares ~ ., data = channelTrain,
 #                method = "gbm",
 #                preProcess = c("center", "scale"),
 #                trControl = trainControl(method = "cv", 
 #                                         number = 5),  
 #                tuneGrid = expand.grid(n.trees = 10, interaction.depth = 4,
 #                                       shrinkage = 0.1, n.minobsinnode = 20))
-# 
-# #plot(boostedTreeFit)
-# #boostedTreeFit$bestTune
-# boostedTreeFit
+
+# # Boosted tree fit with tuneLength (let function decide parameter combinations)
+boostedTreeFit <- train(shares ~ ., data = channelTrain,
+               method = "gbm",
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", 
+                                        number = 5),  
+               tuneGrid = expand.grid(n.trees = 10, interaction.depth = 4,
+                                      shrinkage = 0.1, n.minobsinnode = 20))
+
+#plot(boostedTreeFit)
+#boostedTreeFit$bestTune
+stopCluster(cl)
+boostedTreeFit
 # confusionMatrix(data = channelTest$popular, reference = predict(boostedTreeFit, newdata = channelTest))
 ```
 
