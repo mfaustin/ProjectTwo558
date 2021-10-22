@@ -230,10 +230,10 @@ rfFit
 
 
 ```{r train boosted tree model, include=FALSE}
-# # Create tuning parameters
-# nTrees <- c(10, 20, 50, 100, 200, 400)
-# interactionDepth = 1:4
-# neighbors = c(1, 3, 5, 10, 20)
+# Create tuning parameters
+nTrees <- c(10, 20, 50, 100, 200, 400)
+interactionDepth = 1:4
+neighbors = c(1, 3, 5, 10, 20)
 
 
 # Seeing "Error in summary.connection(connection) : invalid connection"
@@ -247,8 +247,8 @@ registerDoParallel(cl)
 #                preProcess = c("center", "scale"),
 #                trControl = trainControl(method = "cv", 
 #                                         number = 5),  
-#                tuneGrid = expand.grid(n.trees = 10, interaction.depth = 4,
-#                                       shrinkage = 0.1, n.minobsinnode = 20))
+#                tuneGrid = expand.grid(n.trees = nTrees, interaction.depth = interactionDepth,
+#                                       shrinkage = 0.1, n.minobsinnode = neighbors))
 
 # # Boosted tree fit with tuneLength (let function decide parameter combinations)
 boostedTreeFit <- train(shares ~ ., data = channelTrain,
@@ -256,12 +256,15 @@ boostedTreeFit <- train(shares ~ ., data = channelTrain,
                preProcess = c("center", "scale"),
                trControl = trainControl(method = "cv", 
                                         number = 5),  
-               tuneGrid = expand.grid(n.trees = 10, interaction.depth = 4,
-                                      shrinkage = 0.1, n.minobsinnode = 20))
+               tuneLength = 5)
 
-#plot(boostedTreeFit)
-#boostedTreeFit$bestTune
+
+
 stopCluster(cl)
+
+plot(boostedTreeFit)
+#boostedTreeFit$bestTune
+
 boostedTreeFit
 # confusionMatrix(data = channelTest$popular, reference = predict(boostedTreeFit, newdata = channelTest))
 ```
