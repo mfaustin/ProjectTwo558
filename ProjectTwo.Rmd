@@ -77,7 +77,7 @@ reduceVarsData<-fullData %>% select(-url,-timedelta)
 ```{r subset for channel}
 
 #test code to be removed later
-#params$channel<-"data_channel_is_bus"
+params$channel<-"data_channel_is_bus"
 
 #filter by the current params channel
 channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
@@ -85,6 +85,17 @@ channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1)
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
 
+# # Dichotomize popularity of articles based on median number of shares
+# channelData %>% mutate(popular = NA)
+# 
+# for (i in 1:length(channelData)) {
+#   if (channelData$shares[i] >= median(channelData$shares)) {
+#     channelData$popular[i] = 1
+#   }
+#     else {
+#       channelData$popular[i] = 0
+#     }
+#   }
 
 ```
 
@@ -146,18 +157,21 @@ weekdayData <- channelData %>% select(starts_with("weekday_is"))
 # Calculate sum of articles published in each week day
 articlesPublished <- lapply(weekdayData, function(c) sum(c=="1"))
 
+weekdayData
+articlesPublished
+
 # Use factor to set specific order in bar plot
-df <- data.frame(weekday=factor(df$weekday, levels = c("Sunday", "Monday", "Tuesday", 
-                                                       "Wednesday", "Thursday", 
-                                                       "Friday", "Saturday")),
+df <- data.frame(weekday=c("Monday", "Tuesday", "Wednesday", 
+                           "Thursday", "Friday", "Saturday", "Sunday"),
                 count=articlesPublished)
+df$weekday = factor(df$weekday, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", 
+                           "Thursday", "Friday", "Saturday"))
 
 # Create bar plot with total publications by day
 weekdayBar <- ggplot(df, aes(x = weekday, y = articlesPublished)) + geom_bar(stat = "identity", color = "#123456", fill = "#0072B2") 
 weekdayBar + labs(x = "Day", y = "Number published",
        title = "Article publications by day of week") 
 ```
-
 
 ## Modeling  
 
@@ -166,7 +180,7 @@ weekdayBar + labs(x = "Day", y = "Number published",
 #Using set.seed per suggestion so that work will be reproducible
 set.seed(20)
 
-# channelData$shares <- as.factor(channelData$shares)
+channelData$popular <- as.factor(channelData$popular)
 
 dataIndex <-createDataPartition(channelData$shares, p = 0.7, list = FALSE)
 
@@ -192,23 +206,25 @@ channelTest <-channelData[-dataIndex,]
 
 
 ```{r train boosted tree model, include=FALSE}
-# Create tuning parameters
-#nTrees <- seq(from = 25, to = 200, by = 50)
-#interactionDepth = 1:4
-
+# # Create tuning parameters
+# nTrees <- c(10, 20, 50, 100, 200, 400)
+# interactionDepth = 1:4
+# neighbors = c(1, 3, 5, 10, 20)
+# 
 # set.seed(20)
 # # Boosted tree fit
-# boostedTreeFit <- train(shares ~ ., data = channelTrain,
+# boostedTreeFit <- train(popular ~ ., data = channelTrain,
 #                method = "gbm",
 #                preProcess = c("center", "scale"),
-#                trControl = trainControl(method = "repeatedcv", 
-#                                         number = 5, repeats = 3),  
-#                tuneLength = 5)
+#                trControl = trainControl(method = "cv", 
+#                                         number = 5),  
+#                tuneGrid = expand.grid(n.trees = 10, interaction.depth = 4,
+#                                       shrinkage = 0.1, n.minobsinnode = 20))
 # 
-# 
-# # See confusion matrix on test set (correct/incorrect predictions)
-# confusionMatrix(data = channelTest$shares, 
-#                 reference = factor(predict(boostedTreeFit, newdata = channelTest)))
+# #plot(boostedTreeFit)
+# #boostedTreeFit$bestTune
+# boostedTreeFit
+# confusionMatrix(data = channelTest$popular, reference = predict(boostedTreeFit, newdata = channelTest))
 ```
 
 
