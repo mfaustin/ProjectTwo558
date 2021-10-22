@@ -137,7 +137,26 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
   scale_x_continuous(labels = scales::comma) 
 
 ```
+```{r barplot, echo=TRUE, eval=TRUE}
+## Bar plot placeholder
 
+# Subset columns to include only weekday_is_*
+weekdayData <- channelData %>% select(starts_with("weekday_is"))
+
+# Calculate sum of articles published in each week day
+articlesPublished <- lapply(weekdayData, function(c) sum(c=="1"))
+
+# Use factor to set specific order in bar plot
+df <- data.frame(weekday=factor(df$weekday, levels = c("Sunday", "Monday", "Tuesday", 
+                                                       "Wednesday", "Thursday", 
+                                                       "Friday", "Saturday")),
+                count=articlesPublished)
+
+# Create bar plot with total publications by day
+weekdayBar <- ggplot(df, aes(x = weekday, y = articlesPublished)) + geom_bar(stat = "identity", color = "#123456", fill = "#0072B2") 
+weekdayBar + labs(x = "Day", y = "Number published",
+       title = "Article publications by day of week") 
+```
 
 
 ## Modeling  
