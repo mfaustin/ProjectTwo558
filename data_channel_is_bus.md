@@ -60,18 +60,20 @@ channelData<-channelData %>% select(-starts_with("data_channel"))
 
 ### Numerical Summaries
 
-Summary information for shares. This gives an idea of the center and
-spread for shares.
+Summary information for shares grouped by whether an article was a
+weekend article or not.. This gives an idea of the center and spread for
+shares.
 
 ``` r
-channelData %>% 
+channelData %>% group_by(is_weekend) %>% 
   summarise(Avg = mean(shares), Sd = sd(shares), 
     Median = median(shares), IQR =IQR(shares)) %>% kable(caption = "Summary Statistics for Shares")
 ```
 
-|      Avg |       Sd | Median |     IQR |
-|---------:|---------:|-------:|--------:|
-| 3063.019 | 15046.39 |   1400 | 1547.75 |
+| is\_weekend |      Avg |        Sd | Median |  IQR |
+|------------:|---------:|----------:|-------:|-----:|
+|           0 | 2975.514 | 15614.231 |   1300 | 1376 |
+|           1 | 3909.990 |  7563.786 |   2400 | 2400 |
 
 Summary Statistics for Shares
 
@@ -84,14 +86,14 @@ Summary Statistics for Shares
 ### Plots
 
 ``` r
-##For now this is just a test graph to test out automation
+###this one is in progress, hopefully a scatter plot
 g<-ggplot(data = channelData,
-          aes(x=rate_positive_words,y=shares))
-g + geom_point() +
+          aes(x= avg_negative_polarity,y=shares))
+g + geom_point(aes(color=as.factor(is_weekend))) +
+  scale_y_continuous(trans = "pseudo_log")
+  
   scale_y_continuous(labels = scales::comma) 
 ```
-
-![](images/bus/graphOneA-1.png)<!-- -->
 
 ``` r
 ###creating histogram of shares data 
@@ -105,6 +107,10 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
 ```
 
 ![](images/bus/histogram%20of%20shares-1.png)<!-- -->
+
+``` r
+#depending on whether dr. post gives ok to do corrplot I'll do one of these for my 3rd graph
+```
 
 ``` r
 ## Bar plot placeholder
