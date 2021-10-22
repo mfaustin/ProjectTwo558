@@ -230,25 +230,11 @@ rfFit
 
 
 ```{r train boosted tree model, include=FALSE}
-# Create tuning parameters
-nTrees <- c(10, 20, 50, 100, 200, 400)
-interactionDepth = 1:4
-neighbors = c(1, 3, 5, 10, 20)
-
-
 # Seeing "Error in summary.connection(connection) : invalid connection"
 # if I don't re-allocate cores for parallel computing
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-# Boosted tree fit with tuneGrid (specific parameters)
-# boostedTreeFit <- train(shares ~ ., data = channelTrain,
-#                method = "gbm",
-#                preProcess = c("center", "scale"),
-#                trControl = trainControl(method = "cv", 
-#                                         number = 5),  
-#                tuneGrid = expand.grid(n.trees = nTrees, interaction.depth = interactionDepth,
-#                                       shrinkage = 0.1, n.minobsinnode = neighbors))
 
 # # Boosted tree fit with tuneLength (let function decide parameter combinations)
 boostedTreeFit <- train(shares ~ ., data = channelTrain,
@@ -258,15 +244,26 @@ boostedTreeFit <- train(shares ~ ., data = channelTrain,
                                         number = 5),  
                tuneLength = 5)
 
+# Create tuning parameters based on $bestTune above
+nTrees <- boostedTreeFit$bestTune$n.trees
+interactionDepth = boostedTreeFit$bestTune$interaction.depth
+minObs = boostedTreeFit$bestTune$n.minobsinnode
+shrinkParam <- boostedTreeFit$bestTune$shrinkage
+
+# Boosted tree fit with tuneGrid (specific parameters)
+bestBoostedTree <- train(shares ~ ., data = channelTrain,
+               method = "gbm",
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", 
+                                        number = 5),  
+               tuneGrid = expand.grid(n.trees = nTrees, interaction.depth = interactionDepth,
+                                      shrinkage = shrinkParam, n.minobsinnode = minObs))
 
 
 stopCluster(cl)
 
-plot(boostedTreeFit)
-#boostedTreeFit$bestTune
+bestBoostedTree
 
-boostedTreeFit
-# confusionMatrix(data = channelTest$popular, reference = predict(boostedTreeFit, newdata = channelTest))
 ```
 
 
