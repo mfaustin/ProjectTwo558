@@ -77,7 +77,7 @@ reduceVarsData<-fullData %>% select(-url,-timedelta)
 ```{r subset for channel}
 
 #test code to be removed later
-#params$channel<-"data_channel_is_bus"
+params$channel<-"data_channel_is_bus"
 
 #filter by the current params channel
 channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
