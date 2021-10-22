@@ -108,7 +108,7 @@ channelData<-channelData %>% select(-starts_with("data_channel"))
 Summary information for shares.  This gives an idea of the center and spread for shares.  
 
 ```{r shares summary}
-channelData %>% 
+channelData %>% group_by(is_weekend) %>% 
   summarise(Avg = mean(shares), Sd = sd(shares), 
     Median = median(shares), IQR =IQR(shares)) %>% kable(caption = "Summary Statistics for Shares")
 ```
@@ -126,12 +126,15 @@ channelData %>%
 
 ### Plots  
 
-```{r graphOneA}
-##For now this is just a test graph to test out automation
+```{r graphOneA ,eval=FALSE}
+
+###this one is in progress, hopefully a scatter plot
 g<-ggplot(data = channelData,
-          aes(x=rate_positive_words,y=shares))
-g + geom_point() +
+          aes(x= n_tokens_content,y=shares))
+g + geom_point(aes(color=as.factor(is_weekend))) +
   scale_y_continuous(labels = scales::comma) 
+
+
 
 ```
 
@@ -146,6 +149,13 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
   scale_y_continuous(trans = "pseudo_log",
                      breaks = c(0:3, 2000, 6000),minor_breaks = NULL) +
   scale_x_continuous(labels = scales::comma) 
+
+```
+
+
+```{r corrplot or ggpairs}
+
+#depending on whether dr. post gives ok to do corrplot I'll do one of these for my 3rd graph
 
 ```
 
