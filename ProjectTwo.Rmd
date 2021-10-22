@@ -145,9 +145,14 @@ g <- ggplot(channelData, aes( x = shares))
 g + geom_histogram(binwidth=12000,color = "brown", fill = "green", 
   size = 1)  + labs(x="Shares", y="Count",
   title = "Histogram Shares Counts") +
+  scale_y_continuous
+  
   scale_x_continuous(labels = scales::comma) 
 
 ```
+
+
+
 ```{r barplot, echo=TRUE, eval=TRUE}
 ## Bar plot placeholder
 
@@ -200,7 +205,30 @@ channelTest <-channelData[-dataIndex,]
 ```
 
 
-```{r train random forest model}
+```{r train random forest model, include=FALSE}
+
+##without parallel code this was still running after 30 minutes so tried parallel next
+
+##my pc has 8 cores so chose 5
+
+##Followed Parallel instructions on caret page
+##   https://topepo.github.io/caret/parallel-processing.html
+##Even then it took 10 minutest to run
+## and picked m=1 so not sure this is working correctly yet?
+
+library(doParallel)
+cl <- makePSOCKcluster(5)
+registerDoParallel(cl)
+
+rfFit <- train(shares ~ ., data = channelData,
+               method = "rf",
+               trControl = trainControl(method = "cv",
+                                number = 5),
+               tuneGrid = data.frame(mtry = 1:15))
+
+stopCluster(cl)
+
+rfFit
 
 ```
 
