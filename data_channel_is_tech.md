@@ -42,6 +42,18 @@ channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1)
 
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
+
+# # Dichotomize popularity of articles based on median number of shares
+# channelData %>% mutate(popular = NA)
+# 
+# for (i in 1:length(channelData)) {
+#   if (channelData$shares[i] >= median(channelData$shares)) {
+#     channelData$popular[i] = 1
+#   }
+#     else {
+#       channelData$popular[i] = 0
+#     }
+#   }
 ```
 
 ## Summarizations
@@ -82,17 +94,86 @@ g + geom_point() +
 ![](images/tech/graphOneA-1.png)<!-- -->
 
 ``` r
-###I'm still working no this plot
-
 ###creating histogram of shares data 
 g <- ggplot(channelData, aes( x = shares))
 g + geom_histogram(binwidth=12000,color = "brown", fill = "green", 
-  size = 1)  + labs(x="Shares", y="Count",
-  title = "Histogram Shares Counts") +
+  size = 1)  + labs(x="Article Shares", y="Pseudo Log of Count",
+  title = "Histogram of Article Shares") +
+  scale_y_continuous(trans = "pseudo_log",
+                     breaks = c(0:3, 2000, 6000),minor_breaks = NULL) +
   scale_x_continuous(labels = scales::comma) 
 ```
 
 ![](images/tech/histogram%20of%20shares-1.png)<!-- -->
+
+``` r
+## Bar plot placeholder
+
+# Subset columns to include only weekday_is_*
+weekdayData <- channelData %>% select(starts_with("weekday_is"))
+
+# Calculate sum of articles published in each week day
+articlesPublished <- lapply(weekdayData, function(c) sum(c=="1"))
+
+weekdayData
+```
+
+    ## # A tibble: 7,346 x 7
+    ##    weekday_is_monday weekday_is_tuesday weekday_is_wednesday weekday_is_thursday
+    ##                <dbl>              <dbl>                <dbl>               <dbl>
+    ##  1                 1                  0                    0                   0
+    ##  2                 1                  0                    0                   0
+    ##  3                 1                  0                    0                   0
+    ##  4                 1                  0                    0                   0
+    ##  5                 1                  0                    0                   0
+    ##  6                 1                  0                    0                   0
+    ##  7                 1                  0                    0                   0
+    ##  8                 1                  0                    0                   0
+    ##  9                 1                  0                    0                   0
+    ## 10                 1                  0                    0                   0
+    ## # ... with 7,336 more rows, and 3 more variables: weekday_is_friday <dbl>,
+    ## #   weekday_is_saturday <dbl>, weekday_is_sunday <dbl>
+
+``` r
+articlesPublished
+```
+
+    ## $weekday_is_monday
+    ## [1] 1235
+    ## 
+    ## $weekday_is_tuesday
+    ## [1] 1474
+    ## 
+    ## $weekday_is_wednesday
+    ## [1] 1417
+    ## 
+    ## $weekday_is_thursday
+    ## [1] 1310
+    ## 
+    ## $weekday_is_friday
+    ## [1] 989
+    ## 
+    ## $weekday_is_saturday
+    ## [1] 525
+    ## 
+    ## $weekday_is_sunday
+    ## [1] 396
+
+``` r
+# Use factor to set specific order in bar plot
+df <- data.frame(weekday=c("Monday", "Tuesday", "Wednesday", 
+                           "Thursday", "Friday", "Saturday", "Sunday"),
+                count=articlesPublished)
+df$weekday = factor(df$weekday, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", 
+                           "Thursday", "Friday", "Saturday"))
+
+# Create bar plot with total publications by day
+weekdayBar <- ggplot(df, aes(x = weekday, y = articlesPublished)) + geom_bar(stat = "identity", color = "#123456", fill = "#0072B2") 
+weekdayBar + labs(x = "Day", y = "Number published",
+       title = "Article publications by day of week") 
+```
+
+![](images/tech/barplot-1.png)<!-- -->
 
 ## Modeling
 
@@ -100,10 +181,37 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
 #Using set.seed per suggestion so that work will be reproducible
 set.seed(20)
 
+#channelData$popular <- as.factor(channelData$popular)
+
 dataIndex <-createDataPartition(channelData$shares, p = 0.7, list = FALSE)
 
 channelTrain <-channelData[dataIndex,]
 channelTest <-channelData[-dataIndex,]
+```
+
+``` r
+##without parallel code this was still running after 30 minutes so tried parallel next
+
+##my pc has 8 cores so chose 5
+
+##Followed Parallel instructions on caret page
+##   https://topepo.github.io/caret/parallel-processing.html
+##Even then it took 10 minutest to run
+## and picked m=1 so not sure this is working correctly yet?
+
+library(doParallel)
+cl <- makePSOCKcluster(5)
+registerDoParallel(cl)
+
+rfFit <- train(shares ~ ., data = channelData,
+               method = "rf",
+               trControl = trainControl(method = "cv",
+                                number = 5),
+               tuneGrid = data.frame(mtry = 1:15))
+
+stopCluster(cl)
+
+rfFit
 ```
 
 ## Model Comparisions
