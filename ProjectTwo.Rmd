@@ -166,6 +166,8 @@ weekdayBar + labs(x = "Day", y = "Number published",
 #Using set.seed per suggestion so that work will be reproducible
 set.seed(20)
 
+# channelData$shares <- as.factor(channelData$shares)
+
 dataIndex <-createDataPartition(channelData$shares, p = 0.7, list = FALSE)
 
 channelTrain <-channelData[dataIndex,]
@@ -189,8 +191,24 @@ channelTest <-channelData[-dataIndex,]
 ```
 
 
-```{r train boosted tree model}
+```{r train boosted tree model, include=FALSE}
+# Create tuning parameters
+#nTrees <- seq(from = 25, to = 200, by = 50)
+#interactionDepth = 1:4
 
+# set.seed(20)
+# # Boosted tree fit
+# boostedTreeFit <- train(shares ~ ., data = channelTrain,
+#                method = "gbm",
+#                preProcess = c("center", "scale"),
+#                trControl = trainControl(method = "repeatedcv", 
+#                                         number = 5, repeats = 3),  
+#                tuneLength = 5)
+# 
+# 
+# # See confusion matrix on test set (correct/incorrect predictions)
+# confusionMatrix(data = channelTest$shares, 
+#                 reference = factor(predict(boostedTreeFit, newdata = channelTest)))
 ```
 
 
