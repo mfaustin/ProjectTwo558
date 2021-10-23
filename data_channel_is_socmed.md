@@ -4,36 +4,21 @@ Maks Nikiforov and Mark Austin
 Due 10/31/2021
 
 -   [Introduction](#introduction)
--   [Import and Prepare Data](#import-and-prepare-data)
 -   [Summarizations](#summarizations)
     -   [Numerical Summaries](#numerical-summaries)
     -   [Contingency Tables](#contingency-tables)
     -   [Plots](#plots)
 -   [Modeling](#modeling)
--   [Model Comparisions](#model-comparisions)
-
-## Introduction
-
-## Import and Prepare Data
-
-We begin by reading all data into a tibble using `readcsv`.
+-   [Model Comparisons](#model-comparisons)
 
 ``` r
+# Read all data into a tibble
 fullData<-read_csv("./data/OnlineNewsPopularity.csv")
-```
 
-The [data
-documentation](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity)
-says variables url and timedelta are nonpredictive so these can be
-removed.
-
-``` r
+# Eliminate non-predictive variables
 reduceVarsData<-fullData %>% select(-url,-timedelta)
-
 #Are there other vars we do not need to use??
-```
 
-``` r
 #test code to be removed later
 #params$channel<-"data_channel_is_bus"
 
@@ -42,26 +27,35 @@ channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1)
 
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
-
-# # Dichotomize popularity of articles based on median number of shares
-# channelData %>% mutate(popular = NA)
-# 
-# for (i in 1:length(channelData)) {
-#   if (channelData$shares[i] >= median(channelData$shares)) {
-#     channelData$popular[i] = 1
-#   }
-#     else {
-#       channelData$popular[i] = 0
-#     }
-#   }
 ```
+
+## Introduction
+
+This page offers an exploratory data analysis of Social Media articles
+in the [online news popularity data
+set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
+Two variables - `url` and `timedelta` - are non-predictive and have been
+removed. The remaining 53 variables comprise 2323 observations, which
+makes up 5.9 of the original data set.
+
+The broader purpose of this analysis is predicated on using supervised
+learning to predict a target variable - `shares`. To this end, the final
+sections outline four unique models for predicting the number of article
+shares and an assessment of their relative performance. Two models are
+rooted in multiple linear regression analysis, which assesses
+relationships between a response variable and two or more predictors.
+The remaining models are based on random forest and boosted tree
+techniques. The random forest method averages results from multiple
+decision trees which are fitted with a random parameter subset. The
+boosted tree method spurns averages in favor of results that stem from
+weighted iterations (James et al., 2021).
 
 ## Summarizations
 
 ### Numerical Summaries
 
 Summary information for shares grouped by whether an article was a
-weekend article or not.. This gives an idea of the center and spread for
+weekend article or not. This gives an idea of the center and spread for
 shares.
 
 ``` r
@@ -70,12 +64,42 @@ channelData %>% group_by(is_weekend) %>%
     Median = median(shares), IQR =IQR(shares)) %>% kable(caption = "Summary Statistics for Shares")
 ```
 
-| is\_weekend |      Avg |       Sd | Median |  IQR |
-|------------:|---------:|---------:|-------:|-----:|
-|           0 | 3579.021 | 5525.015 |   2100 | 2400 |
-|           1 | 3948.079 | 5516.842 |   2400 | 2600 |
+| is_weekend |      Avg |       Sd | Median |  IQR |
+|-----------:|---------:|---------:|-------:|-----:|
+|          0 | 3579.021 | 5525.015 |   2100 | 2400 |
+|          1 | 3948.079 | 5516.842 |   2400 | 2600 |
 
 Summary Statistics for Shares
+
+The table below highlights variables with the highest and most
+significant correlations in the data set. This output may be considered
+when analyzing covariance to control for potentially confounding
+variables.
+
+``` r
+# Display top 10 highest correlations
+covarianceDF <- corr_cross(df = channelData, max_pvalue = 0.05, top = 10, plot = 0) %>% 
+  select(key, mix, corr, pvalue) %>% rename("Variable 1" = key, "Variable 2" = mix, 
+                                            "Correlation" = corr, "p-value" = pvalue) 
+
+# Display non-zero p-values
+covarianceDF[4] <- format.pval(covarianceDF[4])
+
+kable(covarianceDF)
+```
+
+| Variable 1                 | Variable 2                   | Correlation | p-value     |
+|:---------------------------|:-----------------------------|------------:|:------------|
+| kw_max_min                 | kw_avg_min                   |    0.976238 | \< 2.22e-16 |
+| n_unique_tokens            | n_non_stop_unique_tokens     |    0.924183 | \< 2.22e-16 |
+| kw_max_avg                 | kw_avg_avg                   |    0.879522 | \< 2.22e-16 |
+| rate_positive_words        | rate_negative_words          |   -0.856612 | \< 2.22e-16 |
+| kw_min_min                 | kw_max_max                   |   -0.851158 | \< 2.22e-16 |
+| n_non_stop_words           | average_token_length         |    0.801155 | \< 2.22e-16 |
+| self_reference_max_shares  | self_reference_avg_sharess   |    0.794608 | \< 2.22e-16 |
+| self_reference_min_shares  | self_reference_avg_sharess   |    0.789028 | \< 2.22e-16 |
+| global_rate_negative_words | rate_negative_words          |    0.776907 | \< 2.22e-16 |
+| title_subjectivity         | abs_title_sentiment_polarity |    0.732438 | \< 2.22e-16 |
 
 ### Contingency Tables
 
@@ -121,51 +145,6 @@ weekdayData <- channelData %>% select(starts_with("weekday_is"))
 # Calculate sum of articles published in each week day
 articlesPublished <- lapply(weekdayData, function(c) sum(c=="1"))
 
-weekdayData
-```
-
-    ## # A tibble: 2,323 x 7
-    ##    weekday_is_monday weekday_is_tuesday weekday_is_wednesday weekday_is_thursday
-    ##                <dbl>              <dbl>                <dbl>               <dbl>
-    ##  1                 1                  0                    0                   0
-    ##  2                 1                  0                    0                   0
-    ##  3                 1                  0                    0                   0
-    ##  4                 1                  0                    0                   0
-    ##  5                 0                  0                    1                   0
-    ##  6                 0                  0                    1                   0
-    ##  7                 0                  0                    1                   0
-    ##  8                 0                  0                    0                   1
-    ##  9                 0                  0                    0                   0
-    ## 10                 0                  0                    0                   0
-    ## # ... with 2,313 more rows, and 3 more variables: weekday_is_friday <dbl>,
-    ## #   weekday_is_saturday <dbl>, weekday_is_sunday <dbl>
-
-``` r
-articlesPublished
-```
-
-    ## $weekday_is_monday
-    ## [1] 337
-    ## 
-    ## $weekday_is_tuesday
-    ## [1] 458
-    ## 
-    ## $weekday_is_wednesday
-    ## [1] 416
-    ## 
-    ## $weekday_is_thursday
-    ## [1] 463
-    ## 
-    ## $weekday_is_friday
-    ## [1] 332
-    ## 
-    ## $weekday_is_saturday
-    ## [1] 180
-    ## 
-    ## $weekday_is_sunday
-    ## [1] 137
-
-``` r
 # Use factor to set specific order in bar plot
 df <- data.frame(weekday=c("Monday", "Tuesday", "Wednesday", 
                            "Thursday", "Friday", "Saturday", "Sunday"),
@@ -176,7 +155,7 @@ df$weekday = factor(df$weekday, levels = c("Sunday", "Monday", "Tuesday", "Wedne
 # Create bar plot with total publications by day
 weekdayBar <- ggplot(df, aes(x = weekday, y = articlesPublished)) + geom_bar(stat = "identity", color = "#123456", fill = "#0072B2") 
 weekdayBar + labs(x = "Day", y = "Number published",
-       title = "Article publications by day of week") 
+       title = "Article publications by day of week")
 ```
 
 ![](images/socmed/barplot-1.png)<!-- -->
@@ -187,13 +166,49 @@ weekdayBar + labs(x = "Day", y = "Number published",
 #Using set.seed per suggestion so that work will be reproducible
 set.seed(20)
 
-#channelData$popular <- as.factor(channelData$popular)
-
 dataIndex <-createDataPartition(channelData$shares, p = 0.7, list = FALSE)
 
 channelTrain <-channelData[dataIndex,]
 channelTest <-channelData[-dataIndex,]
 ```
+
+``` r
+# Seeing "Error in summary.connection(connection) : invalid connection" after
+# previous parallel computing runs, stopCluster(cl) may not be working as expected
+cl <- makePSOCKcluster(6)
+registerDoParallel(cl)
+
+# Linear regression 
+lmFit1 <- train(shares ~ ., data = channelTrain,
+               method = "lm",
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", 
+                                        number = 5))
+
+
+stopCluster(cl)
+
+# Predict using test data
+predictLM1 <- predict(lmFit1, newdata = channelTest)
+```
+
+    ## Warning in predict.lm(modelFit, newdata): prediction from a
+    ## rank-deficient fit may be misleading
+
+``` r
+# Metrics
+postResample(predictLM1, obs = channelTest$shares)
+```
+
+    ##         RMSE     Rsquared          MAE 
+    ## 6.415630e+03 1.438419e-02 2.706086e+03
+
+``` r
+# Only RMSE
+RMSE(channelTest$shares, predictLM1)
+```
+
+    ## [1] 6415.63
 
 ``` r
 ##without parallel code this was still running after 30 minutes so tried parallel next
@@ -220,7 +235,20 @@ stopCluster(cl)
 rfFit
 ```
 
-## Model Comparisions
+## Model Comparisons
 
 This part needs to be automated. Maybe create a function and iterate
 over these if they are similar?
+
+<div id="refs" class="references csl-bib-body hanging-indent"
+line-spacing="2">
+
+<div id="ref-2021" class="csl-entry">
+
+James, G., Witten, D., Hastie, T., & Tibshirani, R. (2021). *An
+introduction to statistical learning*. Springer US.
+<https://doi.org/10.1007/978-1-0716-1418-1>
+
+</div>
+
+</div>
