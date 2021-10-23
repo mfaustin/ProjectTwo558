@@ -176,6 +176,7 @@ weekdayBar + labs(x = "Day", y = "Number published",
        title = "Article publications by day of week") 
 ```
 
+
 ## Modeling  
 
 ```{r splitting data}
@@ -236,7 +237,7 @@ cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
 
-# # Boosted tree fit with tuneLength (let function decide parameter combinations)
+# Boosted tree fit with tuneLength (let function decide parameter combinations)
 boostedTreeFit <- train(shares ~ ., data = channelTrain,
                method = "gbm",
                preProcess = c("center", "scale"),
@@ -244,13 +245,13 @@ boostedTreeFit <- train(shares ~ ., data = channelTrain,
                                         number = 5),  
                tuneLength = 5)
 
-# Create tuning parameters based on $bestTune above
+# Define tuning parameters based on $bestTune from the permutations above
 nTrees <- boostedTreeFit$bestTune$n.trees
 interactionDepth = boostedTreeFit$bestTune$interaction.depth
 minObs = boostedTreeFit$bestTune$n.minobsinnode
 shrinkParam <- boostedTreeFit$bestTune$shrinkage
 
-# Boosted tree fit with tuneGrid (specific parameters)
+# Boosted tree fit with defined parameters
 bestBoostedTree <- train(shares ~ ., data = channelTrain,
                method = "gbm",
                preProcess = c("center", "scale"),
@@ -262,8 +263,16 @@ bestBoostedTree <- train(shares ~ ., data = channelTrain,
 
 stopCluster(cl)
 
-bestBoostedTree
+# summary(bestBoostedTree)
 
+# Predict using test data
+predictGBM <- predict(bestBoostedTree, newdata = channelTest)
+
+# Metrics
+postResample(predictGBM, obs = channelTest$shares)
+
+# Only RMSE
+RMSE(channelTest$shares, predictGBM)
 ```
 
 
