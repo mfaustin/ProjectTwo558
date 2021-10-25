@@ -39,21 +39,21 @@ The top ten articles in this category, based on the number of shares on
 social media, include the following titles:
 
     ## # A tibble: 10 × 3
-    ##    url                               shares title
-    ##    <chr>                              <dbl> <lgl>
-    ##  1 http://mashable.com/2013/07/03/l… 843300 NA   
-    ##  2 http://mashable.com/2013/04/15/d… 690400 NA   
-    ##  3 http://mashable.com/2014/04/09/f… 663600 NA   
-    ##  4 http://mashable.com/2013/11/18/k… 652900 NA   
-    ##  5 http://mashable.com/2013/03/02/w… 617900 NA   
-    ##  6 http://mashable.com/2013/11/12/r… 441000 NA   
-    ##  7 http://mashable.com/2014/01/14/a… 310800 NA   
-    ##  8 http://mashable.com/2013/03/28/b… 306100 NA   
-    ##  9 http://mashable.com/2013/11/14/i… 298400 NA   
-    ## 10 http://mashable.com/2014/10/22/e… 284700 NA
+    ##    url                  shares title
+    ##    <chr>                 <dbl> <lgl>
+    ##  1 http://mashable.com… 843300 NA   
+    ##  2 http://mashable.com… 690400 NA   
+    ##  3 http://mashable.com… 663600 NA   
+    ##  4 http://mashable.com… 652900 NA   
+    ##  5 http://mashable.com… 617900 NA   
+    ##  6 http://mashable.com… 441000 NA   
+    ##  7 http://mashable.com… 310800 NA   
+    ##  8 http://mashable.com… 306100 NA   
+    ##  9 http://mashable.com… 298400 NA   
+    ## 10 http://mashable.com… 284700 NA
 
-    ## Warning: Unknown or uninitialised column:
-    ## `title`.
+    ## Warning: Unknown or uninitialised
+    ## column: `title`.
 
 | Shares | Article title                                                   |
 |-------:|:----------------------------------------------------------------|
@@ -200,13 +200,11 @@ weekdayBar + labs(x = "Day", y = "Number published",
 ![](images/entertainment/bar%20plot-1.png)<!-- -->
 
 ``` r
-# Subset columns to include only weekday_is_*, shares
-medianShares <- channelData %>% select(starts_with("weekday_is"), shares)
+# Subset columns to include only weekday_is_*, shares,
+# create categorical variable, "day", denoting day of week (Mon-Sun)
+medianShares <- channelData %>% select(starts_with("weekday_is"), shares) %>% mutate(day = NA)
 
-# Create categorical variable, "day", denoting day of week (Mon-Sun)
-medianShares %>% mutate(day = NA)
-medianShares
-
+# Populate "day"
 for (i in 1:nrow(medianShares)) {
   if (medianShares$weekday_is_monday[i] == 1) {
     medianShares$day[i] = "Monday"
@@ -233,11 +231,7 @@ for (i in 1:nrow(medianShares)) {
     medianShares$day[i] = NA
   }
 }
-```
 
-    ## Warning: Unknown or uninitialised column: `day`.
-
-``` r
 # Transform "day" into factor with levels to control order of boxplots
 medianShares$day <- factor(medianShares$day, 
                            levels = c("Monday", "Tuesday", "Wednesday", 
@@ -254,41 +248,27 @@ sharesBox + geom_boxplot(outlier.shape = NA) +
   # Remove legend after coloration
   theme(legend.position = "none") +
   labs(x = "Day", y = "Shares",
-       title = "Distribution of article shares for each publication day")
+       title = "Distribution of article shares for each publication day") + scale_fill_brewer(palette = "Spectral", name = "Discovery method")
 ```
 
 ![](images/entertainment/boxpot%20-1.png)<!-- -->
 
 ``` r
+# Create variable to for binning the shares
 binnedShares <- channelData %>% mutate(shareQuantile = ntile(channelData$shares, 4))
 binnedShares <- binnedShares %>% mutate(totalMedia = num_imgs + num_videos)
 
-# Render and label metallicity ECDF
+# Render and label word count ECDF, group by binned shares
 avgWordHisto <- ggplot(binnedShares, aes(x = n_tokens_content, colour = shareQuantile))
 avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))) +
   labs(title="ECDF - Number of words in the article \n grouped by article shares (quartile)",
-     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000)
+     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000) + scale_colour_brewer(palette = "Spectral", name = "Discovery method")
 ```
 
-    ## Warning: Removed 165 rows containing non-finite values
-    ## (stat_ecdf).
+    ## Warning: Removed 165 rows containing
+    ## non-finite values (stat_ecdf).
 
 ![](images/entertainment/ecdf-1.png)<!-- -->
-
-``` r
-binnedSummaries <- binnedShares %>% group_by(shareQuantile) %>% 
-  summarise(Mean = mean(n_tokens_content), Median = median(n_tokens_content)) %>%
-  select(shareQuantile, Mean, Median)
-binnedSummaries
-```
-
-    ## # A tibble: 4 × 3
-    ##   shareQuantile  Mean Median
-    ##           <int> <dbl>  <dbl>
-    ## 1             1  583.   423 
-    ## 2             2  616.   440.
-    ## 3             3  631.   458.
-    ## 4             4  600.   410
 
 ## Modeling
 
@@ -322,24 +302,24 @@ stopCluster(cl)
 predictLM1 <- predict(lmFit1, newdata = channelTest)
 ```
 
-    ## Warning in predict.lm(modelFit, newdata):
-    ## prediction from a rank-deficient fit may be
-    ## misleading
+    ## Warning in predict.lm(modelFit,
+    ## newdata): prediction from a rank-
+    ## deficient fit may be misleading
 
 ``` r
 # Metrics
 postResample(predictLM1, obs = channelTest$shares)
 ```
 
-    ##         RMSE     Rsquared          MAE 
-    ## 5.734943e+03 1.831495e-02 2.775672e+03
+    ##         RMSE     Rsquared 
+    ## 5.734943e+03 1.831495e-02 
+    ##          MAE 
+    ## 2.775672e+03
 
 ``` r
 # Only RMSE
-RMSE(channelTest$shares, predictLM1)
+# RMSE(channelTest$shares, predictLM1)
 ```
-
-    ## [1] 5734.943
 
 ``` r
 ##without parallel code this was still running after 30 minutes so tried parallel next
@@ -440,15 +420,15 @@ predictGBM <- predict(bestBoostedTree, newdata = channelTest)
 postResample(predictGBM, obs = channelTest$shares)
 ```
 
-    ##         RMSE     Rsquared          MAE 
-    ## 5.526537e+03 1.968842e-02 2.676962e+03
+    ##         RMSE     Rsquared 
+    ## 5.526537e+03 1.968842e-02 
+    ##          MAE 
+    ## 2.676962e+03
 
 ``` r
 # Only RMSE
-RMSE(channelTest$shares, predictGBM)
+# RMSE(channelTest$shares, predictGBM)
 ```
-
-    ## [1] 5526.537
 
 ## Model Comparisons
 

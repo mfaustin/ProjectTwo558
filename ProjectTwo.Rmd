@@ -75,7 +75,7 @@ channelData<-channelData %>% select(-starts_with("data_channel"))
 
 This page offers an exploratory data analysis of `r currentChannel` articles in the [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). The top ten articles in this category, based on the number of shares on social media, include the following titles:  
 
-```{r scrape titles, echo = FALSE}
+```{r scrape titles, echo = FALSE, message=FALSE}
 # Obtain top 10 rows by number of shares
 topURL <- fullData %>% slice_max(n = 10, shares) %>% select(url, shares)
 
@@ -199,13 +199,11 @@ weekdayBar + labs(x = "Day", y = "Number published",
 ```
 
 ```{r boxpot preparation, echo=TRUE, eval=TRUE, message=FALSE, results='hide'}
-# Subset columns to include only weekday_is_*, shares
-medianShares <- channelData %>% select(starts_with("weekday_is"), shares)
+# Subset columns to include only weekday_is_*, shares,
+# create categorical variable, "day", denoting day of week (Mon-Sun)
+medianShares <- channelData %>% select(starts_with("weekday_is"), shares) %>% mutate(day = NA)
 
-# Create categorical variable, "day", denoting day of week (Mon-Sun)
-medianShares %>% mutate(day = NA)
-medianShares
-
+# Populate "day"
 for (i in 1:nrow(medianShares)) {
   if (medianShares$weekday_is_monday[i] == 1) {
     medianShares$day[i] = "Monday"
@@ -248,23 +246,19 @@ sharesBox + geom_boxplot(outlier.shape = NA) +
   # Remove legend after coloration
   theme(legend.position = "none") +
   labs(x = "Day", y = "Shares",
-       title = "Distribution of article shares for each publication day")
+       title = "Distribution of article shares for each publication day") + scale_fill_brewer(palette = "Spectral", name = "Discovery method")
 ```
 
-```{r ecdf, echo=TRUE, eval=TRUE}
+```{r ecdf, echo=TRUE, eval=TRUE, message=FALSE}
+# Create variable to for binning the shares
 binnedShares <- channelData %>% mutate(shareQuantile = ntile(channelData$shares, 4))
 binnedShares <- binnedShares %>% mutate(totalMedia = num_imgs + num_videos)
 
-# Render and label metallicity ECDF
+# Render and label word count ECDF, group by binned shares
 avgWordHisto <- ggplot(binnedShares, aes(x = n_tokens_content, colour = shareQuantile))
 avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))) +
   labs(title="ECDF - Number of words in the article \n grouped by article shares (quartile)",
-     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000)
-
-binnedSummaries <- binnedShares %>% group_by(shareQuantile) %>% 
-  summarise(Mean = mean(n_tokens_content), Median = median(n_tokens_content)) %>%
-  select(shareQuantile, Mean, Median)
-binnedSummaries
+     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000) + scale_colour_brewer(palette = "Spectral", name = "Discovery method")
 ```
 
 
@@ -306,7 +300,7 @@ predictLM1 <- predict(lmFit1, newdata = channelTest)
 postResample(predictLM1, obs = channelTest$shares)
 
 # Only RMSE
-RMSE(channelTest$shares, predictLM1)
+# RMSE(channelTest$shares, predictLM1)
 ```
 
 
@@ -384,7 +378,7 @@ predictGBM <- predict(bestBoostedTree, newdata = channelTest)
 postResample(predictGBM, obs = channelTest$shares)
 
 # Only RMSE
-RMSE(channelTest$shares, predictGBM)
+# RMSE(channelTest$shares, predictGBM)
 ```
 
 
