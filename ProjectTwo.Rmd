@@ -201,6 +201,8 @@ weekdayBar + labs(x = "Day", y = "Number published",
        title = "Article publications by day of week")
 ```
 
+The box plot below examines the day of article publication (Monday-Sunday) and the associated distribution of article `shares`. The combination of a relatively higher median on Saturday and Sunday, as well as a comparably tall upper whisker, suggests that articles published on weekends may circulate more frequently on social media than articles published on weekdays.       
+
 ```{r boxpot preparation, echo=TRUE, eval=TRUE, message=FALSE, results='hide'}
 # Subset columns to include only weekday_is_*, shares,
 # create categorical variable, "day", denoting day of week (Mon-Sun)
@@ -245,7 +247,7 @@ sharesBox <- ggplot(medianShares, aes(x = day, y = shares, fill = day))
 
 sharesBox + geom_boxplot(outlier.shape = NA) + 
   # Exclude extreme outliers, limit range of y-axis
-  coord_cartesian(ylim = quantile(medianShares$shares, c(0.1, 0.9))) +
+  coord_cartesian(ylim = quantile(medianShares$shares, c(0.1, 0.95))) +
   # Remove legend after coloration
   theme(legend.position = "none") +
   labs(x = "Day", y = "Shares",
