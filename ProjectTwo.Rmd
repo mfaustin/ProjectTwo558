@@ -108,15 +108,40 @@ The broader purpose of this analysis is predicated on using supervised learning 
 
 ### Numerical Summaries  
 
-The first table summarizes information for article shares grouped by whether an article was a weekend article or not. This gives an idea of the center and spread of `shares` across type of day group levels.  
+The first table summarizes information for article shares grouped by whether an article was a weekend article or not. This summary gives an idea of the center and spread of `shares` across type of day group levels.  
 
-```{r shares summary}
+```{r shares weekend summary}
 channelData %>% 
   mutate(dayType=ifelse(is_weekend,"Weekend","Weekday")) %>%
   group_by(dayType) %>% 
   summarise(Avg = mean(shares), Sd = sd(shares), 
     Median = median(shares), IQR =IQR(shares)) %>% kable()
 ```
+
+The next tables gives expands on the idea of the first table by grouping `shares` by each day of the week.  This summary gives an idea of the center and spread of `shares` across day of the week group levels.  
+
+
+```{r shares dow summary}
+dowData<-channelData %>% select(starts_with("weekday_is"),shares) %>%
+  mutate(dayofWeek=case_when(as.logical(weekday_is_monday)~"Monday",
+                             as.logical(weekday_is_tuesday)~"Tuesday",
+                             as.logical(weekday_is_wednesday)~"Wednesday",
+                             as.logical(weekday_is_thursday)~"Thursday",
+                             as.logical(weekday_is_friday)~"Friday",
+                             as.logical(weekday_is_saturday)~"Saturday",
+                             as.logical(weekday_is_sunday)~"Sunday")) %>%
+  select(dayofWeek,shares)
+
+dowLevels<-c("Monday","Tuesday","Wednesday",
+             "Thursday","Friday","Saturday","Sunday")
+dowData$dayofWeek<-factor(dowData$dayofWeek,levels = dowLevels)
+
+dowData %>%  
+  group_by(dayofWeek) %>% 
+  summarise(Avg = mean(shares), Sd = sd(shares), 
+    Median = median(shares), IQR =IQR(shares)) %>% kable()
+```
+
 
 The table below highlights variables with the highest and most significant correlations in the data set. This output may be considered when analyzing covariance to control for potentially confounding variables.  
 
