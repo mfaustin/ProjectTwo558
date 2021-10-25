@@ -10,6 +10,7 @@ Due 10/31/2021
     -   [Plots](#plots)
 -   [Modeling](#modeling)
 -   [Model Comparisons](#model-comparisons)
+-   [References](#references)
 
 ``` r
 # Read all data into a tibble
@@ -34,21 +35,59 @@ channelData<-channelData %>% select(-starts_with("data_channel"))
 This page offers an exploratory data analysis of Entertainment articles
 in the [online news popularity data
 set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
+The top ten articles in this category, based on the number of shares on
+social media, include the following titles:
+
+    ## # A tibble: 10 × 3
+    ##    url                               shares title
+    ##    <chr>                              <dbl> <lgl>
+    ##  1 http://mashable.com/2013/07/03/l… 843300 NA   
+    ##  2 http://mashable.com/2013/04/15/d… 690400 NA   
+    ##  3 http://mashable.com/2014/04/09/f… 663600 NA   
+    ##  4 http://mashable.com/2013/11/18/k… 652900 NA   
+    ##  5 http://mashable.com/2013/03/02/w… 617900 NA   
+    ##  6 http://mashable.com/2013/11/12/r… 441000 NA   
+    ##  7 http://mashable.com/2014/01/14/a… 310800 NA   
+    ##  8 http://mashable.com/2013/03/28/b… 306100 NA   
+    ##  9 http://mashable.com/2013/11/14/i… 298400 NA   
+    ## 10 http://mashable.com/2014/10/22/e… 284700 NA
+
+    ## Warning: Unknown or uninitialised column:
+    ## `title`.
+
+| Shares | Article title                                                   |
+|-------:|:----------------------------------------------------------------|
+| 843300 | Leaked: More Low-Cost iPhone Photos                             |
+| 690400 | Dove Experiment Aims to Change the Way You See Yourself         |
+| 663600 | ‘I’m Able to Make My Mark’: 10 Employees Describe Startup Life  |
+| 652900 | Kanye West Lectures at Harvard About Creativity                 |
+| 617900 | Viral Video Shows the Extent of U.S. Wealth Inequality          |
+| 441000 | Roomba 880 Has More Sucking Power, Trouble With Obstacles       |
+| 310800 | It’s Hot as Hell in Australia Right Now                         |
+| 306100 | BlackBerry Sold 1 Million BlackBerry 10 Smartphones in Q4       |
+| 298400 | IBM Brings Watson to the Masses and Other News You Need to Know |
+| 284700 | U.S. Will Now Monitor All Travelers From Ebola Zone for 21 Days |
+
 Two variables - `url` and `timedelta` - are non-predictive and have been
 removed. The remaining 53 variables comprise 7057 observations, which
-makes up 17.8 of the original data set.
+makes up 17.8 of the original data set. Fernandes et al., who sourced
+the data, concentrated on article characteristics such as verbosity and
+the polarity of content, publication day, the quantity of included
+media, and keyword attributes (Fernandes et al., 2015). A subset of
+these variables and the correlations between them are explored in
+subsequent sections.
 
 The broader purpose of this analysis is predicated on using supervised
 learning to predict a target variable - `shares`. To this end, the final
-sections outline four unique models for predicting the number of article
-shares and an assessment of their relative performance. Two models are
-rooted in multiple linear regression analysis, which assesses
-relationships between a response variable and two or more predictors.
-The remaining models are based on random forest and boosted tree
-techniques. The random forest method averages results from multiple
-decision trees which are fitted with a random parameter subset. The
-boosted tree method spurns averages in favor of results that stem from
-weighted iterations (James et al., 2021).
+sections outline four unique models for conducting such predictions and
+an assessment of their relative performance. Two models are rooted in
+multiple linear regression analysis, which assesses relationships
+between a response variable and two or more predictors. The remaining
+models are based on random forest and boosted tree techniques. The
+random forest method averages results from multiple decision trees which
+are fitted with a random parameter subset. The boosted tree method
+spurns averages in favor of results that stem from weighted iterations
+(James et al., 2021).
 
 ## Summarizations
 
@@ -146,19 +185,110 @@ weekdayData <- channelData %>% select(starts_with("weekday_is"))
 articlesPublished <- lapply(weekdayData, function(c) sum(c=="1"))
 
 # Use factor to set specific order in bar plot
-df <- data.frame(weekday=c("Monday", "Tuesday", "Wednesday", 
+weekPubDF <- data.frame(weekday=c("Monday", "Tuesday", "Wednesday", 
                            "Thursday", "Friday", "Saturday", "Sunday"),
                 count=articlesPublished)
-df$weekday = factor(df$weekday, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", 
+weekPubDF$weekday = factor(weekPubDF$weekday, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", 
                            "Thursday", "Friday", "Saturday"))
 
 # Create bar plot with total publications by day
-weekdayBar <- ggplot(df, aes(x = weekday, y = articlesPublished)) + geom_bar(stat = "identity", color = "#123456", fill = "#0072B2") 
+weekdayBar <- ggplot(weekPubDF, aes(x = weekday, y = articlesPublished)) + geom_bar(stat = "identity", color = "#123456", fill = "#0072B2") 
 weekdayBar + labs(x = "Day", y = "Number published",
        title = "Article publications by day of week")
 ```
 
-![](images/entertainment/barplot-1.png)<!-- -->
+![](images/entertainment/bar%20plot-1.png)<!-- -->
+
+``` r
+# Subset columns to include only weekday_is_*, shares
+medianShares <- channelData %>% select(starts_with("weekday_is"), shares)
+
+# Create categorical variable, "day", denoting day of week (Mon-Sun)
+medianShares %>% mutate(day = NA)
+medianShares
+
+for (i in 1:nrow(medianShares)) {
+  if (medianShares$weekday_is_monday[i] == 1) {
+    medianShares$day[i] = "Monday"
+  }
+  else if (medianShares$weekday_is_tuesday[i] == 1) {
+    medianShares$day[i] = "Tuesday"
+  }
+  else if (medianShares$weekday_is_wednesday[i] == 1) {
+    medianShares$day[i] = "Wednesday"
+  }
+  else if (medianShares$weekday_is_thursday[i] == 1) {
+    medianShares$day[i] = "Thursday"
+  }
+  else if (medianShares$weekday_is_friday[i] == 1) {
+    medianShares$day[i] = "Friday"
+  }
+  else if (medianShares$weekday_is_saturday[i] == 1) {
+    medianShares$day[i] = "Saturday"
+  }
+  else if (medianShares$weekday_is_sunday[i] == 1) {
+    medianShares$day[i] = "Sunday"
+  }
+  else {
+    medianShares$day[i] = NA
+  }
+}
+```
+
+    ## Warning: Unknown or uninitialised column: `day`.
+
+``` r
+# Transform "day" into factor with levels to control order of boxplots
+medianShares$day <- factor(medianShares$day, 
+                           levels = c("Monday", "Tuesday", "Wednesday", 
+                                      "Thursday", "Friday", "Saturday", "Sunday"))
+```
+
+``` r
+# Plot distribution of shares for each day of the week
+sharesBox <- ggplot(medianShares, aes(x = day, y = shares, fill = day))
+
+sharesBox + geom_boxplot(outlier.shape = NA) + 
+  # Exclude extreme outliers, limit range of y-axis
+  coord_cartesian(ylim = quantile(medianShares$shares, c(0.1, 0.9))) +
+  # Remove legend after coloration
+  theme(legend.position = "none") +
+  labs(x = "Day", y = "Shares",
+       title = "Distribution of article shares for each publication day")
+```
+
+![](images/entertainment/boxpot%20-1.png)<!-- -->
+
+``` r
+binnedShares <- channelData %>% mutate(shareQuantile = ntile(channelData$shares, 4))
+binnedShares <- binnedShares %>% mutate(totalMedia = num_imgs + num_videos)
+
+# Render and label metallicity ECDF
+avgWordHisto <- ggplot(binnedShares, aes(x = n_tokens_content, colour = shareQuantile))
+avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))) +
+  labs(title="ECDF - Number of words in the article \n grouped by article shares (quartile)",
+     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000)
+```
+
+    ## Warning: Removed 165 rows containing non-finite values
+    ## (stat_ecdf).
+
+![](images/entertainment/ecdf-1.png)<!-- -->
+
+``` r
+binnedSummaries <- binnedShares %>% group_by(shareQuantile) %>% 
+  summarise(Mean = mean(n_tokens_content), Median = median(n_tokens_content)) %>%
+  select(shareQuantile, Mean, Median)
+binnedSummaries
+```
+
+    ## # A tibble: 4 × 3
+    ##   shareQuantile  Mean Median
+    ##           <int> <dbl>  <dbl>
+    ## 1             1  583.   423 
+    ## 2             2  616.   440.
+    ## 3             3  631.   458.
+    ## 4             4  600.   410
 
 ## Modeling
 
@@ -192,8 +322,9 @@ stopCluster(cl)
 predictLM1 <- predict(lmFit1, newdata = channelTest)
 ```
 
-    ## Warning in predict.lm(modelFit, newdata): prediction from a
-    ## rank-deficient fit may be misleading
+    ## Warning in predict.lm(modelFit, newdata):
+    ## prediction from a rank-deficient fit may be
+    ## misleading
 
 ``` r
 # Metrics
@@ -220,7 +351,6 @@ RMSE(channelTest$shares, predictLM1)
 ##Even then it took 10 minutest to run
 ## and picked m=1 so not sure this is working correctly yet?
 
-library(doParallel)
 cl <- makePSOCKcluster(5)
 registerDoParallel(cl)
 
@@ -235,13 +365,110 @@ stopCluster(cl)
 rfFit
 ```
 
+``` r
+# Seeing "Error in summary.connection(connection) : invalid connection"
+# if I don't re-allocate cores for parallel computing
+cl <- makePSOCKcluster(6)
+registerDoParallel(cl)
+
+
+# Boosted tree fit with tuneLength (let function decide parameter combinations)
+boostedTreeFit <- train(shares ~ ., data = channelTrain,
+               method = "gbm",
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", 
+                                        number = 5),  
+               tuneLength = 5)
+```
+
+    ## Iter   TrainDeviance   ValidDeviance   StepSize   Improve
+    ##      1 74883459.3255             nan     0.1000 -59195.9448
+    ##      2 74610174.5310             nan     0.1000 235174.2445
+    ##      3 74472411.0789             nan     0.1000 -50730.4661
+    ##      4 74199628.3860             nan     0.1000 248316.7804
+    ##      5 73987762.3892             nan     0.1000 187626.7924
+    ##      6 73849167.6011             nan     0.1000 -20132.0985
+    ##      7 73680570.9958             nan     0.1000 3950.5648
+    ##      8 73542792.9006             nan     0.1000 -53459.4558
+    ##      9 73319067.8284             nan     0.1000 115527.0671
+    ##     10 73137387.9021             nan     0.1000 174981.0514
+    ##     20 71885914.9617             nan     0.1000 12810.3741
+    ##     40 70562839.2649             nan     0.1000 -250876.7378
+    ##     50 70258802.5941             nan     0.1000 -219683.0866
+
+``` r
+# Define tuning parameters based on $bestTune from the permutations above
+nTrees <- boostedTreeFit$bestTune$n.trees
+interactionDepth = boostedTreeFit$bestTune$interaction.depth
+minObs = boostedTreeFit$bestTune$n.minobsinnode
+shrinkParam <- boostedTreeFit$bestTune$shrinkage
+
+# Boosted tree fit with defined parameters
+bestBoostedTree <- train(shares ~ ., data = channelTrain,
+               method = "gbm",
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", 
+                                        number = 5),  
+               tuneGrid = expand.grid(n.trees = nTrees, interaction.depth = interactionDepth,
+                                      shrinkage = shrinkParam, n.minobsinnode = minObs))
+```
+
+    ## Iter   TrainDeviance   ValidDeviance   StepSize   Improve
+    ##      1 74931033.5766             nan     0.1000 -57898.6126
+    ##      2 74439138.1639             nan     0.1000 -38577.5611
+    ##      3 74133854.3324             nan     0.1000 244670.8426
+    ##      4 74061767.6939             nan     0.1000 -30057.4682
+    ##      5 74012627.6940             nan     0.1000 -11766.9761
+    ##      6 73838845.1341             nan     0.1000 8365.1426
+    ##      7 73558794.4139             nan     0.1000 -93576.3141
+    ##      8 73342830.4186             nan     0.1000 157085.8730
+    ##      9 73153351.0696             nan     0.1000 -91113.4457
+    ##     10 72908101.9937             nan     0.1000 72246.6018
+    ##     20 71907617.7624             nan     0.1000 -13124.9064
+    ##     40 70656330.9549             nan     0.1000 -161775.6576
+    ##     50 70115320.8647             nan     0.1000 -34228.8382
+
+``` r
+stopCluster(cl)
+
+# summary(bestBoostedTree)
+
+# Predict using test data
+predictGBM <- predict(bestBoostedTree, newdata = channelTest)
+
+# Metrics
+postResample(predictGBM, obs = channelTest$shares)
+```
+
+    ##         RMSE     Rsquared          MAE 
+    ## 5.526537e+03 1.968842e-02 2.676962e+03
+
+``` r
+# Only RMSE
+RMSE(channelTest$shares, predictGBM)
+```
+
+    ## [1] 5526.537
+
 ## Model Comparisons
 
 This part needs to be automated. Maybe create a function and iterate
 over these if they are similar?
 
+## References
+
 <div id="refs" class="references csl-bib-body hanging-indent"
 line-spacing="2">
+
+<div id="ref-10.1007/978-3-319-23485-4_53" class="csl-entry">
+
+Fernandes, K., Vinagre, P., & Cortez, P. (2015). A proactive intelligent
+decision support system for predicting the popularity of online news. In
+F. Pereira, P. Machado, E. Costa, & A. Cardoso (Eds.), *Progress in
+artificial intelligence* (pp. 535–546). Springer International
+Publishing.
+
+</div>
 
 <div id="ref-2021" class="csl-entry">
 

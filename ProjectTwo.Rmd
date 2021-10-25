@@ -46,7 +46,10 @@ title: "Analysis for the `r currentChannel` Channel"
    library(tidyverse)
    library(caret)
    library(knitr)
+   library(doParallel)
    library(lares)
+   library(treemapify)
+   library(rvest)
 ```
 
 ```{r import data, message=FALSE}
@@ -70,9 +73,32 @@ channelData<-channelData %>% select(-starts_with("data_channel"))
 
 ## Introduction  
 
-This page offers an exploratory data analysis of `r currentChannel` articles in the [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). Two variables - `url` and `timedelta` - are non-predictive and have been removed. The remaining `r ncol(channelData)` variables comprise `r nrow(channelData)` observations, which makes up `r round(nrow(channelData)/nrow(fullData)*100, 1)` of the original data set.   
+This page offers an exploratory data analysis of `r currentChannel` articles in the [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). The top ten articles in this category, based on the number of shares on social media, include the following titles:  
 
-The broader purpose of this analysis is predicated on using supervised learning to predict a target variable - `shares`. To this end, the final sections outline four unique models for predicting the number of article shares and an assessment of their relative performance. Two models are rooted in multiple linear regression analysis, which assesses relationships between a response variable and two or more predictors. The remaining models are based on random forest and boosted tree techniques. The random forest method averages results from multiple decision trees which are fitted with a random parameter subset. The boosted tree method spurns averages in favor of results that stem from weighted iterations [@2021].             
+```{r scrape titles, echo = FALSE}
+# Obtain top 10 rows by number of shares
+topURL <- fullData %>% slice_max(n = 10, shares) %>% select(url, shares)
+
+# Create "title" column
+mutate(topURL, title = NA)
+
+# Initialize vector to store formatted URLs
+urlString <- vector()
+
+# Populate "title" column with article titles
+for (i in 1:nrow(topURL)) {
+  urlString[i] <- paste0("", topURL$url[i], "")
+  topURL$title[i] <- read_html(urlString[i]) %>% html_nodes("title") %>%
+    html_text()
+}
+
+topURL %>% select(shares, title) %>% kable(col.names = c("Shares", "Article title"))
+```
+
+
+Two variables - `url` and `timedelta` - are non-predictive and have been removed. The remaining `r ncol(channelData)` variables comprise `r nrow(channelData)` observations, which makes up `r round(nrow(channelData)/nrow(fullData)*100, 1)` of the original data set. Fernandes et al., who sourced the data, concentrated on article characteristics such as verbosity and the polarity of content, publication day, the quantity of included media, and keyword attributes [@10.1007/978-3-319-23485-4_53]. A subset of these variables and the correlations between them are explored in subsequent sections.       
+
+The broader purpose of this analysis is predicated on using supervised learning to predict a target variable - `shares`. To this end, the final sections outline four unique models for conducting such predictions and an assessment of their relative performance. Two models are rooted in multiple linear regression analysis, which assesses relationships between a response variable and two or more predictors. The remaining models are based on random forest and boosted tree techniques. The random forest method averages results from multiple decision trees which are fitted with a random parameter subset. The boosted tree method spurns averages in favor of results that stem from weighted iterations [@2021].             
 
 ## Summarizations  
 
@@ -150,9 +176,7 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
 
 ```
 
-
-
-```{r barplot, echo=TRUE, eval=TRUE}
+```{r bar plot}
 ## Bar plot placeholder
 
 # Subset columns to include only weekday_is_*
@@ -162,19 +186,86 @@ weekdayData <- channelData %>% select(starts_with("weekday_is"))
 articlesPublished <- lapply(weekdayData, function(c) sum(c=="1"))
 
 # Use factor to set specific order in bar plot
-df <- data.frame(weekday=c("Monday", "Tuesday", "Wednesday", 
+weekPubDF <- data.frame(weekday=c("Monday", "Tuesday", "Wednesday", 
                            "Thursday", "Friday", "Saturday", "Sunday"),
                 count=articlesPublished)
-df$weekday = factor(df$weekday, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", 
+weekPubDF$weekday = factor(weekPubDF$weekday, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", 
                            "Thursday", "Friday", "Saturday"))
 
 # Create bar plot with total publications by day
-weekdayBar <- ggplot(df, aes(x = weekday, y = articlesPublished)) + geom_bar(stat = "identity", color = "#123456", fill = "#0072B2") 
+weekdayBar <- ggplot(weekPubDF, aes(x = weekday, y = articlesPublished)) + geom_bar(stat = "identity", color = "#123456", fill = "#0072B2") 
 weekdayBar + labs(x = "Day", y = "Number published",
        title = "Article publications by day of week")
 ```
 
+```{r boxpot preparation, echo=TRUE, eval=TRUE, message=FALSE, results='hide'}
+# Subset columns to include only weekday_is_*, shares
+medianShares <- channelData %>% select(starts_with("weekday_is"), shares)
 
+# Create categorical variable, "day", denoting day of week (Mon-Sun)
+medianShares %>% mutate(day = NA)
+medianShares
+
+for (i in 1:nrow(medianShares)) {
+  if (medianShares$weekday_is_monday[i] == 1) {
+    medianShares$day[i] = "Monday"
+  }
+  else if (medianShares$weekday_is_tuesday[i] == 1) {
+    medianShares$day[i] = "Tuesday"
+  }
+  else if (medianShares$weekday_is_wednesday[i] == 1) {
+    medianShares$day[i] = "Wednesday"
+  }
+  else if (medianShares$weekday_is_thursday[i] == 1) {
+    medianShares$day[i] = "Thursday"
+  }
+  else if (medianShares$weekday_is_friday[i] == 1) {
+    medianShares$day[i] = "Friday"
+  }
+  else if (medianShares$weekday_is_saturday[i] == 1) {
+    medianShares$day[i] = "Saturday"
+  }
+  else if (medianShares$weekday_is_sunday[i] == 1) {
+    medianShares$day[i] = "Sunday"
+  }
+  else {
+    medianShares$day[i] = NA
+  }
+}
+
+# Transform "day" into factor with levels to control order of boxplots
+medianShares$day <- factor(medianShares$day, 
+                           levels = c("Monday", "Tuesday", "Wednesday", 
+                                      "Thursday", "Friday", "Saturday", "Sunday"))
+```
+```{r boxpot , echo=TRUE, eval=TRUE}
+# Plot distribution of shares for each day of the week
+sharesBox <- ggplot(medianShares, aes(x = day, y = shares, fill = day))
+
+sharesBox + geom_boxplot(outlier.shape = NA) + 
+  # Exclude extreme outliers, limit range of y-axis
+  coord_cartesian(ylim = quantile(medianShares$shares, c(0.1, 0.9))) +
+  # Remove legend after coloration
+  theme(legend.position = "none") +
+  labs(x = "Day", y = "Shares",
+       title = "Distribution of article shares for each publication day")
+```
+
+```{r ecdf, echo=TRUE, eval=TRUE}
+binnedShares <- channelData %>% mutate(shareQuantile = ntile(channelData$shares, 4))
+binnedShares <- binnedShares %>% mutate(totalMedia = num_imgs + num_videos)
+
+# Render and label metallicity ECDF
+avgWordHisto <- ggplot(binnedShares, aes(x = n_tokens_content, colour = shareQuantile))
+avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))) +
+  labs(title="ECDF - Number of words in the article \n grouped by article shares (quartile)",
+     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000)
+
+binnedSummaries <- binnedShares %>% group_by(shareQuantile) %>% 
+  summarise(Mean = mean(n_tokens_content), Median = median(n_tokens_content)) %>%
+  select(shareQuantile, Mean, Median)
+binnedSummaries
+```
 
 
 ## Modeling  
@@ -235,7 +326,6 @@ RMSE(channelTest$shares, predictLM1)
 ##Even then it took 10 minutest to run
 ## and picked m=1 so not sure this is working correctly yet?
 
-library(doParallel)
 cl <- makePSOCKcluster(5)
 registerDoParallel(cl)
 
@@ -252,7 +342,7 @@ rfFit
 ```
 
 
-```{r train boosted tree model, include=FALSE}
+```{r train boosted tree model}
 # Seeing "Error in summary.connection(connection) : invalid connection"
 # if I don't re-allocate cores for parallel computing
 cl <- makePSOCKcluster(6)
@@ -321,7 +411,7 @@ This part needs to be automated.  Maybe create a function and iterate over these
 
 ```
 
-
+## References 
 
 
 
