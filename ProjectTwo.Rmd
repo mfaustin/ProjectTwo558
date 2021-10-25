@@ -77,10 +77,8 @@ This page offers an exploratory data analysis of `r currentChannel` articles in 
 
 ```{r scrape titles, echo = FALSE, message=FALSE}
 # Obtain top 10 rows by number of shares
-topURL <- fullData %>% slice_max(n = 10, shares) %>% select(url, shares)
-
-# Create "title" column
-mutate(topURL, title = NA)
+topURL <- fullData %>% slice_max(n = 10, shares) %>% select(url, shares) %>% 
+  mutate(title = NA)
 
 # Initialize vector to store formatted URLs
 urlString <- vector()
@@ -246,7 +244,7 @@ sharesBox + geom_boxplot(outlier.shape = NA) +
   # Remove legend after coloration
   theme(legend.position = "none") +
   labs(x = "Day", y = "Shares",
-       title = "Distribution of article shares for each publication day") + scale_fill_brewer(palette = "Spectral", name = "Discovery method")
+       title = "Distribution of article shares for each publication day") + scale_fill_brewer(palette = "Spectral")
 ```
 
 ```{r ecdf, echo=TRUE, eval=TRUE, message=FALSE}
@@ -258,7 +256,7 @@ binnedShares <- binnedShares %>% mutate(totalMedia = num_imgs + num_videos)
 avgWordHisto <- ggplot(binnedShares, aes(x = n_tokens_content, colour = shareQuantile))
 avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))) +
   labs(title="ECDF - Number of words in the article \n grouped by article shares (quartile)",
-     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000) + scale_colour_brewer(palette = "Spectral", name = "Discovery method")
+     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000) + scale_colour_brewer(palette = "Spectral", name = "Shares (quartile)")
 ```
 
 

@@ -38,23 +38,6 @@ set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
 The top ten articles in this category, based on the number of shares on
 social media, include the following titles:
 
-    ## # A tibble: 10 × 3
-    ##    url                  shares title
-    ##    <chr>                 <dbl> <lgl>
-    ##  1 http://mashable.com… 843300 NA   
-    ##  2 http://mashable.com… 690400 NA   
-    ##  3 http://mashable.com… 663600 NA   
-    ##  4 http://mashable.com… 652900 NA   
-    ##  5 http://mashable.com… 617900 NA   
-    ##  6 http://mashable.com… 441000 NA   
-    ##  7 http://mashable.com… 310800 NA   
-    ##  8 http://mashable.com… 306100 NA   
-    ##  9 http://mashable.com… 298400 NA   
-    ## 10 http://mashable.com… 284700 NA
-
-    ## Warning: Unknown or uninitialised
-    ## column: `title`.
-
 | Shares | Article title                                                   |
 |-------:|:----------------------------------------------------------------|
 | 843300 | Leaked: More Low-Cost iPhone Photos                             |
@@ -248,7 +231,7 @@ sharesBox + geom_boxplot(outlier.shape = NA) +
   # Remove legend after coloration
   theme(legend.position = "none") +
   labs(x = "Day", y = "Shares",
-       title = "Distribution of article shares for each publication day") + scale_fill_brewer(palette = "Spectral", name = "Discovery method")
+       title = "Distribution of article shares for each publication day") + scale_fill_brewer(palette = "Spectral")
 ```
 
 ![](images/entertainment/boxpot%20-1.png)<!-- -->
@@ -262,7 +245,7 @@ binnedShares <- binnedShares %>% mutate(totalMedia = num_imgs + num_videos)
 avgWordHisto <- ggplot(binnedShares, aes(x = n_tokens_content, colour = shareQuantile))
 avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))) +
   labs(title="ECDF - Number of words in the article \n grouped by article shares (quartile)",
-     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000) + scale_colour_brewer(palette = "Spectral", name = "Discovery method")
+     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000) + scale_colour_brewer(palette = "Spectral", name = "Shares (quartile)")
 ```
 
     ## Warning: Removed 165 rows containing
