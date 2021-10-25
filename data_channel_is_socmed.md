@@ -26,8 +26,14 @@ reduceVarsData<-fullData %>% select(-url,-timedelta)
 #filter by the current params channel
 channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
 
+# Temp, will clean up
+channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
+
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
+
+# Temp, will clean up
+channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
 ```
 
 ## Introduction
@@ -38,18 +44,18 @@ set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
 The top ten articles in this category, based on the number of shares on
 social media, include the following titles:
 
-| Shares | Article title                                                   |
-|-------:|:----------------------------------------------------------------|
-| 843300 | Leaked: More Low-Cost iPhone Photos                             |
-| 690400 | Dove Experiment Aims to Change the Way You See Yourself         |
-| 663600 | ‘I’m Able to Make My Mark’: 10 Employees Describe Startup Life  |
-| 652900 | Kanye West Lectures at Harvard About Creativity                 |
-| 617900 | Viral Video Shows the Extent of U.S. Wealth Inequality          |
-| 441000 | Roomba 880 Has More Sucking Power, Trouble With Obstacles       |
-| 310800 | It’s Hot as Hell in Australia Right Now                         |
-| 306100 | BlackBerry Sold 1 Million BlackBerry 10 Smartphones in Q4       |
-| 298400 | IBM Brings Watson to the Masses and Other News You Need to Know |
-| 284700 | U.S. Will Now Monitor All Travelers From Ebola Zone for 21 Days |
+| Shares | Article title                                                       |
+|-------:|:--------------------------------------------------------------------|
+| 122800 | World’s First Sprout-Powered Battery Just Lit Up a Christmas Tree   |
+|  59000 | Facebook Hashtags Not Open to Advertising – Yet                     |
+|  57600 | 5 Fascinating Facts We Learned From Reddit This Week                |
+|  57000 | The Most Memorable Brand Wins and Fails of 2013                     |
+|  54100 | Even Superman Can’t Resist Photoshopping His Pics                   |
+|  53100 | Watch the First-Ever YouTube Music Awards Here                      |
+|  51900 | The 100 Most Beautiful Songs in the World, According to Reddit      |
+|  47700 | Rebooted NASA Spacecraft Begins a New Mission 36 Years After Launch |
+|  47400 | ‘Doctor Who’ Crash Course: 12 Essential Episodes                    |
+|  41900 | The Tech Behind the Film ‘Gravity’                                  |
 
 Two variables - `url` and `timedelta` - are non-predictive and have been
 removed. The remaining 53 variables comprise 2323 observations, which

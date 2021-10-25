@@ -26,8 +26,14 @@ reduceVarsData<-fullData %>% select(-url,-timedelta)
 #filter by the current params channel
 channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
 
+# Temp, will clean up
+channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
+
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
+
+# Temp, will clean up
+channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
 ```
 
 ## Introduction
@@ -38,18 +44,18 @@ set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
 The top ten articles in this category, based on the number of shares on
 social media, include the following titles:
 
-| Shares | Article title                                                   |
-|-------:|:----------------------------------------------------------------|
-| 843300 | Leaked: More Low-Cost iPhone Photos                             |
-| 690400 | Dove Experiment Aims to Change the Way You See Yourself         |
-| 663600 | ‘I’m Able to Make My Mark’: 10 Employees Describe Startup Life  |
-| 652900 | Kanye West Lectures at Harvard About Creativity                 |
-| 617900 | Viral Video Shows the Extent of U.S. Wealth Inequality          |
-| 441000 | Roomba 880 Has More Sucking Power, Trouble With Obstacles       |
-| 310800 | It’s Hot as Hell in Australia Right Now                         |
-| 306100 | BlackBerry Sold 1 Million BlackBerry 10 Smartphones in Q4       |
-| 298400 | IBM Brings Watson to the Masses and Other News You Need to Know |
-| 284700 | U.S. Will Now Monitor All Travelers From Ebola Zone for 21 Days |
+| Shares | Article title                                                                         |
+|-------:|:--------------------------------------------------------------------------------------|
+| 284700 | U.S. Will Now Monitor All Travelers From Ebola Zone for 21 Days                       |
+| 141400 | Study: 54% of Online Adults Would Spend Tax Refunds on Travel                         |
+| 128500 | Apple Fixes FaceTime Bug With iOS Update                                              |
+| 115700 | Mystery drones fly over French nuclear sites                                          |
+| 111300 | Prince Harry Reaches South Pole After 200-Mile Trek for Charity                       |
+| 108400 | 12 Hours in ‘Utopia’: On the Set of Fox’s Newest Reality Show                         |
+|  96500 | These Glasses Let You Play in 3D Virtual Worlds                                       |
+|  84800 | Thousands of Children Orphaned by West Africa’s Ebola Crisis                          |
+|  75500 | With Lima climate talks entering critical period, Kerry tries to rally leaders to act |
+|  69300 | 11 People Who Should Cancel Their Gym Memberships                                     |
 
 Two variables - `url` and `timedelta` - are non-predictive and have been
 removed. The remaining 53 variables comprise 8427 observations, which

@@ -26,8 +26,14 @@ reduceVarsData<-fullData %>% select(-url,-timedelta)
 #filter by the current params channel
 channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
 
+# Temp, will clean up
+channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
+
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
+
+# Temp, will clean up
+channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
 ```
 
 ## Introduction
@@ -38,18 +44,18 @@ set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
 The top ten articles in this category, based on the number of shares on
 social media, include the following titles:
 
-| Shares | Article title                                                   |
-|-------:|:----------------------------------------------------------------|
-| 843300 | Leaked: More Low-Cost iPhone Photos                             |
-| 690400 | Dove Experiment Aims to Change the Way You See Yourself         |
-| 663600 | ‘I’m Able to Make My Mark’: 10 Employees Describe Startup Life  |
-| 652900 | Kanye West Lectures at Harvard About Creativity                 |
-| 617900 | Viral Video Shows the Extent of U.S. Wealth Inequality          |
-| 441000 | Roomba 880 Has More Sucking Power, Trouble With Obstacles       |
-| 310800 | It’s Hot as Hell in Australia Right Now                         |
-| 306100 | BlackBerry Sold 1 Million BlackBerry 10 Smartphones in Q4       |
-| 298400 | IBM Brings Watson to the Masses and Other News You Need to Know |
-| 284700 | U.S. Will Now Monitor All Travelers From Ebola Zone for 21 Days |
+| Shares | Article title                                                        |
+|-------:|:---------------------------------------------------------------------|
+| 208300 | Obama to Discuss NSA Reform With Lawmakers                           |
+| 196700 | No Movie Trailer Is Complete Without This One Line                   |
+| 139600 | 87% of American Teenagers Send Text Messages Each Month              |
+|  81200 | High-Tech Wristband Monitors Mood                                    |
+|  73100 | 22 Books for Your Ultimate Summer Reading List                       |
+|  56000 | Finalists Exhibit Tech for $465 Million Virtual Border Fence         |
+|  54900 | Cybersecurity Experts Will Face Off in Mock NetWars                  |
+|  54200 | 84% of Smartphone Owners Use Apps While Getting Ready in the Morning |
+|  49700 | It’s Still Easy to Get Away With Revenge Porn                        |
+|  45100 | Beats Solo² Headphones Sound Great, But You’re Paying for Fashion    |
 
 Two variables - `url` and `timedelta` - are non-predictive and have been
 removed. The remaining 53 variables comprise 2099 observations, which

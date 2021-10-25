@@ -26,8 +26,14 @@ reduceVarsData<-fullData %>% select(-url,-timedelta)
 #filter by the current params channel
 channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
 
+# Temp, will clean up
+channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
+
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
+
+# Temp, will clean up
+channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
 ```
 
 ## Introduction
@@ -40,16 +46,16 @@ social media, include the following titles:
 
 | Shares | Article title                                                   |
 |-------:|:----------------------------------------------------------------|
-| 843300 | Leaked: More Low-Cost iPhone Photos                             |
 | 690400 | Dove Experiment Aims to Change the Way You See Yourself         |
-| 663600 | ‘I’m Able to Make My Mark’: 10 Employees Describe Startup Life  |
 | 652900 | Kanye West Lectures at Harvard About Creativity                 |
-| 617900 | Viral Video Shows the Extent of U.S. Wealth Inequality          |
-| 441000 | Roomba 880 Has More Sucking Power, Trouble With Obstacles       |
 | 310800 | It’s Hot as Hell in Australia Right Now                         |
 | 306100 | BlackBerry Sold 1 Million BlackBerry 10 Smartphones in Q4       |
 | 298400 | IBM Brings Watson to the Masses and Other News You Need to Know |
-| 284700 | U.S. Will Now Monitor All Travelers From Ebola Zone for 21 Days |
+| 158900 | All The Christmas Movies You Need in One Mashup                 |
+| 144400 | Can Beautiful Design Make Your Resume Stand Out?                |
+| 139500 | Apple to Return $32.5 Million for Accidental App Purchases      |
+| 110200 | How Big Data Is Influencing Hiring                              |
+| 106400 | MapBox Enables Amazing Custom Maps for Sites and Apps           |
 
 Two variables - `url` and `timedelta` - are non-predictive and have been
 removed. The remaining 53 variables comprise 6258 observations, which
