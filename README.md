@@ -65,7 +65,7 @@ params = lapply(channels, FUN = function(x){list(channel = x)})
 
 
 #put into a data frame 
-reports <- tibble(output_files, params)
+reports <- tibble(output_file, params)
 reports
 
 #use render to create report for each channel
