@@ -162,9 +162,12 @@ kable(covarianceDF)
 ### Contingency Tables  
 
 
-```{r shares by size}
+```{r shares by size, eval=FALSE}
 ##I want to try and split up shares then create a contingency table
 
+kable(table(dowData$dayofWeek,cut(dowData$shares, c(0,100,1000,20000,40000,50000,100000),dig.lab = 7)))
+
+#table(cut(channelData$shares, c(0,1,1000,20000,40000,50000,100000)))
 
 ```
 
