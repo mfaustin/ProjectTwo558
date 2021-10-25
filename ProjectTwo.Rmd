@@ -252,6 +252,8 @@ sharesBox + geom_boxplot(outlier.shape = NA) +
        title = "Distribution of article shares for each publication day") + scale_fill_brewer(palette = "Spectral")
 ```
 
+For the empirical cumulative distribution function (ECDF) below, the `dplyr` ranking function `ntile()` divides `shares` into four groups. Observations with the fewest shares are placed into group 1, those with the most shares are placed into group 4, and intermediaries reside in groups 2 and 3. The horizontal axis lists word count, and the vertical axis lists the percentage of content with that word count. A divergence of the colored lines suggests that the number of words differs in content with the fewest and most shares.     
+
 ```{r ecdf, echo=TRUE, eval=TRUE, message=FALSE}
 # Create variable to for binning the shares
 binnedShares <- channelData %>% mutate(shareQuantile = ntile(channelData$shares, 4))
@@ -260,8 +262,9 @@ binnedShares <- binnedShares %>% mutate(totalMedia = num_imgs + num_videos)
 # Render and label word count ECDF, group by binned shares
 avgWordHisto <- ggplot(binnedShares, aes(x = n_tokens_content, colour = shareQuantile))
 avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))) +
-  labs(title="ECDF - Number of words in the article \n grouped by article shares (quartile)",
-     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000) + scale_colour_brewer(palette = "Spectral", name = "Shares (quartile)")
+  labs(title="ECDF - Number of words in the article \ngrouped by article shares (ranked)",
+     y = "ECDF", x="Word count") + xlim(0,2000) + 
+  scale_colour_brewer(palette = "Spectral", name = "Article shares \n(group rank)")
 ```
 
 
