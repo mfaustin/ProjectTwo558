@@ -108,12 +108,14 @@ The broader purpose of this analysis is predicated on using supervised learning 
 
 ### Numerical Summaries  
 
-Summary information for shares grouped by whether an article was a weekend article or not. This gives an idea of the center and spread for shares.  
+The first table summarizes information for article shares grouped by whether an article was a weekend article or not. This gives an idea of the center and spread of `shares` across type of day group levels.  
 
 ```{r shares summary}
-channelData %>% group_by(is_weekend) %>% 
+channelData %>% 
+  mutate(dayType=ifelse(is_weekend,"Weekend","Weekday")) %>%
+  group_by(dayType) %>% 
   summarise(Avg = mean(shares), Sd = sd(shares), 
-    Median = median(shares), IQR =IQR(shares)) %>% kable(caption = "Summary Statistics for Shares")
+    Median = median(shares), IQR =IQR(shares)) %>% kable()
 ```
 
 The table below highlights variables with the highest and most significant correlations in the data set. This output may be considered when analyzing covariance to control for potentially confounding variables.  
@@ -158,10 +160,14 @@ g + geom_point(aes(color=as.factor(is_weekend))) +
 
 ```
 
+The following histogram looks at the distribution of `shares`.  A pseudo log y scale with modified y break values was used so that article `shares` with low frequency will appear.  We can tell from the histogram whether `shares` has a symmetric or skewed distribution.  The distribution is symmetric if the tails are the same around the center.  The distribution is right skewed if there is a long left tail and right skewed if there is a long right tail.  
 
 ```{r histogram of shares}
 
 ###creating histogram of shares data 
+##scales comma was used to avoid the default scientific notation
+##pseudo log with breaks was used to make low frequency values 
+## more visisble
 g <- ggplot(channelData, aes( x = shares))
 g + geom_histogram(binwidth=12000,color = "brown", fill = "green", 
   size = 1)  + labs(x="Article Shares", y="Pseudo Log of Count",
