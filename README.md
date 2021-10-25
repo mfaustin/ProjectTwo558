@@ -13,17 +13,19 @@ Github pages is enabled to allow viewing the channel analysis pages as linked ht
 ## Required R Packages
 
 The following R packages are required to run R code used in this
-project and/or create this document.
+project and/or create the linked channel documents.
 
 -   `tidyverse` The tidyverse package is used for data handling and
-    plotting.
+    plotting.  
     
 -   `caret` The caret package is used for working with data and models.    
 
--   `knitr` The knitr package is used for document image handling.
+-   `knitr` The knitr package is used for document image handling.  
 
 -   `rmarkdown` The rmarkdown package is used by a render program to
-    render this document.
+    render this document.  
+    
+-   `doParallel` The doParallel package is used to enable [parallel processing with the caret package](https://topepo.github.io/caret/parallel-processing.html)  
     
 
 ## Analyses by Channel  
