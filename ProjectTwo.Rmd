@@ -14,22 +14,28 @@ params:
 ##  for each of the 6 channels
 ##Also setting up currentChannel variable 
 if (params$channel=="data_channel_is_bus") {
-  knitr::opts_chunk$set(fig.path = "images/bus/")
+  knitr::opts_chunk$set(fig.path = "images/bus/",
+                        cache.path = "cache/bus/")
   currentChannel<-"Business"
 } else if (params$channel=="data_channel_is_entertainment") {
-  knitr::opts_chunk$set(fig.path = "images/entertainment/")
+  knitr::opts_chunk$set(fig.path = "images/entertainment/",
+                        cache.path="cache/entertainment/")
   currentChannel<-"Entertainment"
 } else if (params$channel=="data_channel_is_lifestyle") {
-  knitr::opts_chunk$set(fig.path = "images/lifestyle/")
+  knitr::opts_chunk$set(fig.path = "images/lifestyle/",
+                        cache.path = "cache/lifestyle/")
   currentChannel<-"Lifestyle"
 } else if (params$channel=="data_channel_is_socmed") {
-  knitr::opts_chunk$set(fig.path = "images/socmed/")
+  knitr::opts_chunk$set(fig.path = "images/socmed/",
+                        cache.path = "cache/socmed/")
   currentChannel<-"Social Media"
 } else if (params$channel=="data_channel_is_tech") {
-  knitr::opts_chunk$set(fig.path = "images/tech/")
+  knitr::opts_chunk$set(fig.path = "images/tech/",
+                        cache.path = "cache/tech/")
   currentChannel<-"Tech"
 } else if (params$channel=="data_channel_is_world") {
-  knitr::opts_chunk$set(fig.path = "images/world/")
+  knitr::opts_chunk$set(fig.path = "images/world/",
+                        cache.path = "cache/world/")
   currentChannel<-"World"
 } 
 #knitr::opts_chunk$set(fig.path = "images/")
@@ -80,7 +86,7 @@ channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
 
 This page offers an exploratory data analysis of `r currentChannel` articles in the [online news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). The top ten articles in this category, based on the number of shares on social media, include the following titles:  
 
-```{r scrape titles, echo = FALSE, message=FALSE}
+```{r scrape titles, echo = FALSE, message=FALSE, cache=TRUE}
 # Obtain top 10 rows by number of shares
 topURL <- channelDataURL %>% slice_max(n = 10, shares) %>% select(url, shares) %>% 
   mutate(title = NA)
