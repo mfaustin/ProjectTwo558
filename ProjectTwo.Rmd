@@ -411,23 +411,40 @@ postResample(predictLM1, obs = channelTest$shares)
 ```
 
 
-```{r train linear regression model two, cache=TRUE}
+```{r train linear regression model two, cache=TRUE,eval=FALSE}
+
+cl <- makePSOCKcluster(6)
+registerDoParallel(cl)
+
+# Linear regression 
+# Using same vars as in corrplot 
+lmFit2 <- train(shares ~ kw_min_avg +
+        kw_max_avg + LDA_03 + self_reference_min_shares +
+        kw_avg_max + self_reference_avg_sharess + LDA_02 +
+        kw_avg_min + LDA_01 + n_non_stop_unique_tokens, 
+               data = channelTrain,
+               method = "lm",
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", 
+                                        number = 10))
+
+
+stopCluster(cl)
+
+lmFit2
 
 ```
 
 
 ```{r train random forest model, eval=FALSE, cache=TRUE}
 
-##without parallel code this was still running after 30 minutes so tried parallel next
-
-##my pc has 8 cores so chose 5
+##without parallel code this was still running after 30 minutes so tried parallel next and got runtime down to around 10 minutes
 
 ##Followed Parallel instructions on caret page
 ##   https://topepo.github.io/caret/parallel-processing.html
-##Even then it took 10 minutest to run
-## and picked m=1 so not sure this is working correctly yet?
 
-cl <- makePSOCKcluster(5)
+
+cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
 rfFit <- train(shares ~ ., data = channelData,
