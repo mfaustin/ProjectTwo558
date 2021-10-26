@@ -232,9 +232,9 @@ corrplot(Correlation,type="lower",method="number",
 
 ```
 
+The following two scatterplots 
 
-
-```{r scatterplot ,eval=FALSE}
+```{r scatterplots ,message=FALSE,warning=FALSE,eval=FALSE}
 
 ###this one is in progress, hopefully a scatter plot
 g<-ggplot(data = channelData,
@@ -242,11 +242,15 @@ g<-ggplot(data = channelData,
 g + geom_point(aes(color=as.factor(is_weekend))) +
   geom_smooth(method = lm) +
   scale_y_continuous(labels = scales::comma) +
-  scale_x_continuous(labels = scales::comma)
-  
-#  scale_y_continuous(labels = scales::comma) 
+  scale_x_continuous(labels = scales::comma) 
 
-#  scale_y_continuous(trans = "pseudo_log")
+g<-ggplot(data = channelData,
+          aes(x= kw_max_avg,y=shares))
+g + geom_point(aes(color=as.factor(is_weekend))) +
+  geom_smooth(method = lm) +
+  ylim(0,10000) +
+  xlim(0,20000)
+  
 
 ```
 
