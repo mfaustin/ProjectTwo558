@@ -161,13 +161,14 @@ kable(covarianceDF)
 
 ### Contingency Tables  
 
+The following contingency table displays counts and sums for the number of article shares within given ranges by the day of week shared.  Share ranges were selected to illustrate lower, medium, and higher ranges of shares.  Examining these counts can show possible patterns of shares by day or week and the range grouping for shares.  
 
-```{r shares by size, eval=FALSE}
-##I want to try and split up shares then create a contingency table
+```{r shares by size}
 
-kable(table(dowData$dayofWeek,cut(dowData$shares, c(0,100,1000,20000,40000,50000,100000),dig.lab = 7)))
+##dig.lab is needed to avoid R defaulting to scientific notation
+kable(addmargins(table(dowData$dayofWeek,cut(dowData$shares, c(0,200,1000,10000,20000,860000),dig.lab = 7))))
 
-#table(cut(channelData$shares, c(0,1,1000,20000,40000,50000,100000)))
+
 
 ```
 

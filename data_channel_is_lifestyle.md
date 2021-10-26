@@ -82,22 +82,58 @@ spurns averages in favor of results that stem from weighted iterations
 
 ### Numerical Summaries
 
-Summary information for shares grouped by whether an article was a
-weekend article or not. This gives an idea of the center and spread for
-shares.
+The first table summarizes information for article shares grouped by
+whether an article was a weekend article or not. This summary gives an
+idea of the center and spread of `shares` across type of day group
+levels.
 
 ``` r
-channelData %>% group_by(is_weekend) %>% 
+channelData %>% 
+  mutate(dayType=ifelse(is_weekend,"Weekend","Weekday")) %>%
+  group_by(dayType) %>% 
   summarise(Avg = mean(shares), Sd = sd(shares), 
-    Median = median(shares), IQR =IQR(shares)) %>% kable(caption = "Summary Statistics for Shares")
+    Median = median(shares), IQR =IQR(shares)) %>% kable()
 ```
 
-| is_weekend |      Avg |       Sd | Median |  IQR |
-|-----------:|---------:|---------:|-------:|-----:|
-|          0 | 3628.255 | 9551.749 |   1600 | 2050 |
-|          1 | 3916.696 | 5044.188 |   2100 | 2600 |
+| dayType |      Avg |       Sd | Median |  IQR |
+|:--------|---------:|---------:|-------:|-----:|
+| Weekday | 3628.255 | 9551.749 |   1600 | 2050 |
+| Weekend | 3916.696 | 5044.188 |   2100 | 2600 |
 
-Summary Statistics for Shares
+The next tables gives expands on the idea of the first table by grouping
+`shares` by each day of the week. This summary gives an idea of the
+center and spread of `shares` across day of the week group levels.
+
+``` r
+dowData<-channelData %>% select(starts_with("weekday_is"),shares) %>%
+  mutate(dayofWeek=case_when(as.logical(weekday_is_monday)~"Monday",
+                             as.logical(weekday_is_tuesday)~"Tuesday",
+                             as.logical(weekday_is_wednesday)~"Wednesday",
+                             as.logical(weekday_is_thursday)~"Thursday",
+                             as.logical(weekday_is_friday)~"Friday",
+                             as.logical(weekday_is_saturday)~"Saturday",
+                             as.logical(weekday_is_sunday)~"Sunday")) %>%
+  select(dayofWeek,shares)
+
+dowLevels<-c("Monday","Tuesday","Wednesday",
+             "Thursday","Friday","Saturday","Sunday")
+dowData$dayofWeek<-factor(dowData$dayofWeek,levels = dowLevels)
+
+dowData %>%  
+  group_by(dayofWeek) %>% 
+  summarise(Avg = mean(shares), Sd = sd(shares), 
+    Median = median(shares), IQR =IQR(shares)) %>% kable()
+```
+
+| dayofWeek |      Avg |        Sd | Median |     IQR |
+|:----------|---------:|----------:|-------:|--------:|
+| Monday    | 4345.711 | 14072.938 |   1600 | 2575.00 |
+| Tuesday   | 4152.494 | 13544.476 |   1500 | 1975.00 |
+| Wednesday | 3173.180 |  5608.013 |   1600 | 1800.25 |
+| Thursday  | 3500.268 |  5820.627 |   1600 | 2250.00 |
+| Friday    | 3025.869 |  4539.610 |   1500 | 2000.00 |
+| Saturday  | 4062.451 |  5350.749 |   2100 | 2650.00 |
+| Sunday    | 3790.376 |  4771.926 |   2100 | 2675.00 |
 
 The table below highlights variables with the highest and most
 significant correlations in the data set. This output may be considered
@@ -116,24 +152,42 @@ covarianceDF[4] <- format.pval(covarianceDF[4])
 kable(covarianceDF)
 ```
 
-| Variable 1                 | Variable 2                 | Correlation | p-value     |
-|:---------------------------|:---------------------------|------------:|:------------|
-| kw_max_min                 | kw_avg_min                 |    0.956574 | \< 2.22e-16 |
-| self_reference_max_shares  | self_reference_avg_sharess |    0.911916 | \< 2.22e-16 |
-| n_unique_tokens            | n_non_stop_unique_tokens   |    0.906660 | \< 2.22e-16 |
-| n_non_stop_words           | average_token_length       |    0.870183 | \< 2.22e-16 |
-| kw_min_min                 | kw_max_max                 |   -0.856370 | \< 2.22e-16 |
-| kw_max_avg                 | kw_avg_avg                 |    0.818423 | \< 2.22e-16 |
-| global_rate_negative_words | rate_negative_words        |    0.815529 | \< 2.22e-16 |
-| self_reference_min_shares  | self_reference_avg_sharess |    0.787590 | \< 2.22e-16 |
-| kw_max_max                 | kw_avg_max                 |    0.750110 | \< 2.22e-16 |
-| rate_positive_words        | rate_negative_words        |   -0.731286 | \< 2.22e-16 |
+| Variable 1                    | Variable 2                    | Correlation | p-value       |
+|:------------------------------|:------------------------------|------------:|:--------------|
+| kw\_max\_min                  | kw\_avg\_min                  |    0.956574 | &lt; 2.22e-16 |
+| self\_reference\_max\_shares  | self\_reference\_avg\_sharess |    0.911916 | &lt; 2.22e-16 |
+| n\_unique\_tokens             | n\_non\_stop\_unique\_tokens  |    0.906660 | &lt; 2.22e-16 |
+| n\_non\_stop\_words           | average\_token\_length        |    0.870183 | &lt; 2.22e-16 |
+| kw\_min\_min                  | kw\_max\_max                  |   -0.856370 | &lt; 2.22e-16 |
+| kw\_max\_avg                  | kw\_avg\_avg                  |    0.818423 | &lt; 2.22e-16 |
+| global\_rate\_negative\_words | rate\_negative\_words         |    0.815529 | &lt; 2.22e-16 |
+| self\_reference\_min\_shares  | self\_reference\_avg\_sharess |    0.787590 | &lt; 2.22e-16 |
+| kw\_max\_max                  | kw\_avg\_max                  |    0.750110 | &lt; 2.22e-16 |
+| rate\_positive\_words         | rate\_negative\_words         |   -0.731286 | &lt; 2.22e-16 |
 
 ### Contingency Tables
 
+The following contingency table displays counts and sums for the number
+of article shares within given ranges by the day of week shared. Share
+ranges were selected to illustrate lower, medium, and higher ranges of
+shares. Examining these counts can show possible patterns of shares by
+day or week and the range grouping for shares.
+
 ``` r
-##I want to try and split up shares then create a contingency table
+##dig.lab is needed to avoid R defaulting to scientific notation
+kable(addmargins(table(dowData$dayofWeek,cut(dowData$shares, c(0,200,1000,10000,20000,860000),dig.lab = 7))))
 ```
+
+|           | (0,200\] | (200,1000\] | (1000,10000\] | (10000,20000\] | (20000,860000\] |  Sum |
+|:----------|---------:|------------:|--------------:|---------------:|----------------:|-----:|
+| Monday    |        3 |          81 |           213 |             16 |               9 |  322 |
+| Tuesday   |        1 |          86 |           229 |              9 |               9 |  334 |
+| Wednesday |        3 |         106 |           254 |             17 |               8 |  388 |
+| Thursday  |        3 |          87 |           241 |             18 |               9 |  358 |
+| Friday    |        3 |          76 |           210 |              9 |               7 |  305 |
+| Saturday  |        0 |           9 |           156 |             13 |               4 |  182 |
+| Sunday    |        0 |          17 |           180 |              7 |               6 |  210 |
+| Sum       |       13 |         462 |          1483 |             89 |              52 | 2099 |
 
 ### Plots
 
@@ -147,8 +201,19 @@ g + geom_point(aes(color=as.factor(is_weekend))) +
   scale_y_continuous(labels = scales::comma) 
 ```
 
+The following histogram looks at the distribution of `shares`. A pseudo
+log y scale with modified y break values was used so that article
+`shares` with low frequency will appear. We can tell from the histogram
+whether `shares` has a symmetric or skewed distribution. The
+distribution is symmetric if the tails are the same around the center.
+The distribution is right skewed if there is a long left tail and right
+skewed if there is a long right tail.
+
 ``` r
 ###creating histogram of shares data 
+##scales comma was used to avoid the default scientific notation
+##pseudo log with breaks was used to make low frequency values 
+## more visisble
 g <- ggplot(channelData, aes( x = shares))
 g + geom_histogram(binwidth=12000,color = "brown", fill = "green", 
   size = 1)  + labs(x="Article Shares", y="Pseudo Log of Count",
@@ -187,6 +252,13 @@ weekdayBar + labs(x = "Day", y = "Number published",
 ```
 
 ![](images/lifestyle/bar%20plot-1.png)<!-- -->
+
+The box plot below examines the day of article publication
+(Monday-Sunday) and the associated distribution of article `shares`. The
+combination of a relatively higher median on Saturday and Sunday, as
+well as a comparably tall upper whisker, suggests that articles
+published on weekends may circulate more frequently on social media than
+articles published on weekdays.
 
 ``` r
 # Subset columns to include only weekday_is_*, shares,
@@ -233,7 +305,7 @@ sharesBox <- ggplot(medianShares, aes(x = day, y = shares, fill = day))
 
 sharesBox + geom_boxplot(outlier.shape = NA) + 
   # Exclude extreme outliers, limit range of y-axis
-  coord_cartesian(ylim = quantile(medianShares$shares, c(0.1, 0.9))) +
+  coord_cartesian(ylim = quantile(medianShares$shares, c(0.1, 0.95))) +
   # Remove legend after coloration
   theme(legend.position = "none") +
   labs(x = "Day", y = "Shares",
@@ -241,6 +313,15 @@ sharesBox + geom_boxplot(outlier.shape = NA) +
 ```
 
 ![](images/lifestyle/boxpot%20-1.png)<!-- -->
+
+For the empirical cumulative distribution function (ECDF) below, the
+`dplyr` ranking function `ntile()` divides `shares` into four groups.
+Observations with the fewest shares are placed into group 1, those with
+the most shares are placed into group 4, and intermediaries reside in
+groups 2 and 3. The horizontal axis lists word count, and the vertical
+axis lists the percentage of content with that word count. A divergence
+of the colored lines suggests that the number of words differs in
+content with the fewest and most shares.
 
 ``` r
 # Create variable to for binning the shares
@@ -250,12 +331,12 @@ binnedShares <- binnedShares %>% mutate(totalMedia = num_imgs + num_videos)
 # Render and label word count ECDF, group by binned shares
 avgWordHisto <- ggplot(binnedShares, aes(x = n_tokens_content, colour = shareQuantile))
 avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))) +
-  labs(title="ECDF - Number of words in the article \n grouped by article shares (quartile)",
-     y = "ECDF", x="Word count", color = "Shares (quartile)") + xlim(0,2000) + scale_colour_brewer(palette = "Spectral", name = "Shares (quartile)")
+  labs(title="ECDF - Number of words in the article \ngrouped by article shares (ranked)",
+     y = "ECDF", x="Word count") + xlim(0,2000) + 
+  scale_colour_brewer(palette = "Spectral", name = "Article shares \n(group rank)")
 ```
 
-    ## Warning: Removed 32 rows containing
-    ## non-finite values (stat_ecdf).
+    ## Warning: Removed 32 rows containing non-finite values (stat_ecdf).
 
 ![](images/lifestyle/ecdf-1.png)<!-- -->
 
@@ -291,19 +372,16 @@ stopCluster(cl)
 predictLM1 <- predict(lmFit1, newdata = channelTest)
 ```
 
-    ## Warning in predict.lm(modelFit,
-    ## newdata): prediction from a rank-
-    ## deficient fit may be misleading
+    ## Warning in predict.lm(modelFit, newdata): prediction from a rank-deficient fit may
+    ## be misleading
 
 ``` r
 # Metrics
 postResample(predictLM1, obs = channelTest$shares)
 ```
 
-    ##         RMSE     Rsquared 
-    ## 8.503740e+03 1.159597e-02 
-    ##          MAE 
-    ## 3.575040e+03
+    ##         RMSE     Rsquared          MAE 
+    ## 8.503740e+03 1.159597e-02 3.575040e+03
 
 ``` r
 # Only RMSE
@@ -363,7 +441,7 @@ boostedTreeFit <- train(shares ~ ., data = channelTrain,
     ##     10 79524000.2178             nan     0.1000 -51799.9033
     ##     20 78326911.3969             nan     0.1000 -87852.6769
     ##     40 77299640.7199             nan     0.1000 -307732.0770
-    ##     50 77262389.4913             nan     0.1000 -346201.1441
+    ##     50 77259569.8737             nan     0.1000 -346192.3710
 
 ``` r
 # Define tuning parameters based on $bestTune from the permutations above
@@ -395,7 +473,7 @@ bestBoostedTree <- train(shares ~ ., data = channelTrain,
     ##     10 79809064.5556             nan     0.1000 25150.8771
     ##     20 78602094.7717             nan     0.1000 -205025.7621
     ##     40 77636659.7839             nan     0.1000 -384193.5900
-    ##     50 77310584.7715             nan     0.1000 -20652.8537
+    ##     50 77310041.8829             nan     0.1000 -20642.4436
 
 ``` r
 stopCluster(cl)
@@ -409,10 +487,8 @@ predictGBM <- predict(bestBoostedTree, newdata = channelTest)
 postResample(predictGBM, obs = channelTest$shares)
 ```
 
-    ##         RMSE     Rsquared 
-    ## 8.542163e+03 3.954615e-03 
-    ##          MAE 
-    ## 3.418219e+03
+    ##         RMSE     Rsquared          MAE 
+    ## 8.542609e+03 3.945912e-03 3.418604e+03
 
 ``` r
 # Only RMSE
