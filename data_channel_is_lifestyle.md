@@ -59,12 +59,12 @@ social media, include the following titles:
 
 Two variables - `url` and `timedelta` - are non-predictive and have been
 removed. The remaining 53 variables comprise 2099 observations, which
-makes up 5.3 of the original data set. Fernandes et al., who sourced the
-data, concentrated on article characteristics such as verbosity and the
-polarity of content, publication day, the quantity of included media,
-and keyword attributes (Fernandes et al., 2015). A subset of these
-variables and the correlations between them are explored in subsequent
-sections.
+makes up 5.3 percent of the original data set. Fernandes et al., who
+sourced the data, concentrated on article characteristics such as
+verbosity and the polarity of content, publication day, the quantity of
+included media, and keyword attributes (Fernandes et al., 2015). A
+subset of these variables and the correlations between them are explored
+in subsequent sections.
 
 The broader purpose of this analysis is predicated on using supervised
 learning to predict a target variable - `shares`. To this end, the final
@@ -227,9 +227,22 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
 
 ![](images/lifestyle/histogram%20of%20shares-1.png)<!-- -->
 
+Fernandes et al
+
 ``` r
-#depending on whether dr. post gives ok to do corrplot I'll do one of these for my 3rd graph
+Correlation<-cor(select(channelData, shares, kw_min_avg,
+        kw_max_avg, LDA_03, self_reference_min_shares,
+        kw_avg_max, self_reference_avg_sharess, LDA_02,
+        kw_avg_min, LDA_01, n_non_stop_unique_tokens),
+        method = "spearman")
+
+
+corrplot(Correlation,type="upper",tl.pos="lt", tl.cex = .75)
+corrplot(Correlation,type="lower",method="number",
+         add=TRUE,diag=FALSE,tl.pos="n",tl.cex = .75,number.cex = .75)
 ```
+
+![](images/lifestyle/corrplot-1.png)<!-- -->
 
 ``` r
 ## Bar plot placeholder
