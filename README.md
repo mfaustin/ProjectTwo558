@@ -27,7 +27,11 @@ project and/or create the linked channel documents.
 -   `rmarkdown` The rmarkdown package is used by a render program to
     render this document.  
     
--   `doParallel` The doParallel package is used to enable [parallel processing with the caret package](https://topepo.github.io/caret/parallel-processing.html)  
+-   `doParallel` The doParallel package is used to enable [parallel processing with the caret package](https://topepo.github.io/caret/parallel-processing.html)
+
+-   `lares` The lares package provides the `corr_cross()` function to compute and return the highest and most significant variable correlations in a data frame. 
+
+-   `rvest` The rvest package provides the functions `read_html()` and `html_text()` to scrape the titles of top ten Mashable articles in each category of the online news popularity data set.
     
 
 ## Analyses by Channel  
