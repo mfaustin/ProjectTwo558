@@ -194,16 +194,6 @@ kable(addmargins(table
 
 ### Plots
 
-``` r
-###this one is in progress, hopefully a scatter plot
-g<-ggplot(data = channelData,
-          aes(x= avg_negative_polarity,y=shares))
-g + geom_point(aes(color=as.factor(is_weekend))) +
-  scale_y_continuous(trans = "pseudo_log")
-  
-  scale_y_continuous(labels = scales::comma) 
-```
-
 The following histogram looks at the distribution of `shares`. A pseudo
 log y scale with modified y break values was used so that article
 `shares` with low frequency will appear. We can tell from the histogram
@@ -228,7 +218,14 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
 
 ![](images/tech/histogram%20of%20shares-1.png)<!-- -->
 
-Fernandes et al
+Fernandes et al highlight several variables in their random forest model
+(Fernandes et al., 2015). The following variables from their top 11 were
+included in the following correlation plot:
+`shares`,`kw_min_avg`,`kw_max_avg`,`LDA_03`,`self_reference_min_shares`,`kw_avg_max`,`self_reference_avg_sharess`,`LDA_02`,`kw_avg_min`,`LDA_01`,`n_non_stop_unique_tokens`.  
+The plot shows correlation with the response variable `shares` and the
+other various combinations. Larger circles indicate stronger positive
+(blue) or negative (red) correlation with correlation values on the
+lower portion of the plot.
 
 ``` r
 Correlation<-cor(select(channelData, shares, kw_min_avg,
@@ -244,6 +241,16 @@ corrplot(Correlation,type="lower",method="number",
 ```
 
 ![](images/tech/corrplot-1.png)<!-- -->
+
+``` r
+###this one is in progress, hopefully a scatter plot
+g<-ggplot(data = channelData,
+          aes(x= avg_negative_polarity,y=shares))
+g + geom_point(aes(color=as.factor(is_weekend))) +
+  scale_y_continuous(trans = "pseudo_log")
+  
+  scale_y_continuous(labels = scales::comma) 
+```
 
 ``` r
 ## Bar plot placeholder
