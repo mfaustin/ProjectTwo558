@@ -166,7 +166,9 @@ The following contingency table displays counts and sums for the number of artic
 ```{r shares by size}
 
 ##dig.lab is needed to avoid R defaulting to scientific notation
-kable(addmargins(table(dowData$dayofWeek,cut(dowData$shares, c(0,200,1000,10000,20000,860000),dig.lab = 7))))
+kable(addmargins(table
+                 (dowData$dayofWeek,cut(dowData$shares,
+                  c(0,200,1000,10000,860000),dig.lab = 7))))
 
 
 

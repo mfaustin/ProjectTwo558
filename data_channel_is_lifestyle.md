@@ -175,19 +175,21 @@ day or week and the range grouping for shares.
 
 ``` r
 ##dig.lab is needed to avoid R defaulting to scientific notation
-kable(addmargins(table(dowData$dayofWeek,cut(dowData$shares, c(0,200,1000,10000,20000,860000),dig.lab = 7))))
+kable(addmargins(table
+                 (dowData$dayofWeek,cut(dowData$shares,
+                  c(0,200,1000,10000,860000),dig.lab = 7))))
 ```
 
-|           | (0,200\] | (200,1000\] | (1000,10000\] | (10000,20000\] | (20000,860000\] |  Sum |
-|:----------|---------:|------------:|--------------:|---------------:|----------------:|-----:|
-| Monday    |        3 |          81 |           213 |             16 |               9 |  322 |
-| Tuesday   |        1 |          86 |           229 |              9 |               9 |  334 |
-| Wednesday |        3 |         106 |           254 |             17 |               8 |  388 |
-| Thursday  |        3 |          87 |           241 |             18 |               9 |  358 |
-| Friday    |        3 |          76 |           210 |              9 |               7 |  305 |
-| Saturday  |        0 |           9 |           156 |             13 |               4 |  182 |
-| Sunday    |        0 |          17 |           180 |              7 |               6 |  210 |
-| Sum       |       13 |         462 |          1483 |             89 |              52 | 2099 |
+|           | (0,200\] | (200,1000\] | (1000,10000\] | (10000,860000\] |  Sum |
+|:----------|---------:|------------:|--------------:|----------------:|-----:|
+| Monday    |        3 |          81 |           213 |              25 |  322 |
+| Tuesday   |        1 |          86 |           229 |              18 |  334 |
+| Wednesday |        3 |         106 |           254 |              25 |  388 |
+| Thursday  |        3 |          87 |           241 |              27 |  358 |
+| Friday    |        3 |          76 |           210 |              16 |  305 |
+| Saturday  |        0 |           9 |           156 |              17 |  182 |
+| Sunday    |        0 |          17 |           180 |              13 |  210 |
+| Sum       |       13 |         462 |          1483 |             141 | 2099 |
 
 ### Plots
 
