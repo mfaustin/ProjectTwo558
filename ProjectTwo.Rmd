@@ -48,7 +48,6 @@ title: "Analysis for the `r currentChannel` Channel"
    library(knitr)
    library(doParallel)
    library(lares)
-   library(treemapify)
    library(rvest)
 ```
 
