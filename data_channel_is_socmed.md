@@ -252,19 +252,60 @@ corrplot(Correlation,type="lower",method="number",
 
 ![](images/socmed/corrplot-1.png)<!-- -->
 
+The following two scatterplots illustrate the relationship between
+response article shares `shares` and predictor average keyword (max
+shares) `kw_max_ave`. Both scatterplots plot these variables and add a
+simple linear regression line to the graph.
+
+For either graph, an upward relationship indicates higher average
+keyword values tend towards more article shares. A negative relation
+would indicate a lower average keyword values tend towards more article
+shares.
+
+In addition, both graphs use differing color for weekday and weekend
+articles so that we can spot any possible trends with those values too.
+
+The first scatterplot uses the default R generated axes so that
+potential outliers or significant observations can be observed.
+
+The second scatterplot reduces the scale of both axes to make it easier
+to spot relationships for the majority of data that occur within these
+bounds.
+
 ``` r
-###this one is in progress, hopefully a scatter plot
-g<-ggplot(data = channelData,
+###Create new factor version of weekend variable 
+### to use later in graphs
+scatterData<-channelData %>% 
+  mutate(dayType=ifelse(is_weekend,"Weekend","Weekday"))
+scatterData$dayType<-as.factor(scatterData$dayType)
+
+###First scatter plot with ALL data 
+g<-ggplot(data = scatterData,
           aes(x= kw_max_avg,y=shares))
-g + geom_point(aes(color=as.factor(is_weekend))) +
+g + geom_point(aes(color=dayType)) +
   geom_smooth(method = lm) +
   scale_y_continuous(labels = scales::comma) +
-  scale_x_continuous(labels = scales::comma)
-  
-#  scale_y_continuous(labels = scales::comma) 
-
-#  scale_y_continuous(trans = "pseudo_log")
+  scale_x_continuous(labels = scales::comma) +
+  labs(x="Avg. keyword (max. shares)", y="Article Shares",
+       title = "Scatter Plot of Article Shares Versus Avg. keyword (max. shares)",color="") 
 ```
+
+![](images/socmed/scatterplots%20-1.png)<!-- -->
+
+``` r
+###Second scatter plot with reduced axes
+g<-ggplot(data = scatterData,
+          aes(x= kw_max_avg,y=shares))
+g + geom_point(aes(color=dayType)) +
+  geom_smooth(method = lm) +
+  ylim(0,10000) +
+  xlim(0,20000) +
+    labs(x="Avg. keyword (max. shares)", y="Article Shares",
+       title = "Scatter Plot of Article Shares Versus Avg. keyword (max. shares)",
+       color="")
+```
+
+![](images/socmed/scatterplots%20-2.png)<!-- -->
 
 ``` r
 ## Bar plot placeholder
