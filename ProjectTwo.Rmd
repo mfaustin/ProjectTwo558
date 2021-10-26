@@ -232,7 +232,9 @@ corrplot(Correlation,type="lower",method="number",
 
 ```
 
-The following two scatterplots illustrate the relationship between response article shares `shares` and predictor average keyword (max shares) `kw_max_ave`.  Both scatterplots plot these variables and add a simple linear regression line to the graph.  
+The following two scatterplots illustrate the relationship between response article shares `shares` and predictor average keyword (max shares) `kw_max_ave`.  `kw_max_ave` was chosen because it was one of the potential predictors examined in the previous correlation plot.  
+
+Both scatterplots plot these variables and add a simple linear regression line to the graph.  
 
 For either graph, an upward relationship indicates higher average keyword values tend towards more article shares.  A negative relation would indicate a lower average keyword values tend towards more article shares.  
 
