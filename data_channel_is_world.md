@@ -219,24 +219,35 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
 
 Fernandes et al highlight several variables in their random forest model
 (Fernandes et al., 2015). The following variables from their top 11 were
-included in the following correlation plot:
-`shares`,`kw_min_avg`,`kw_max_avg`,`LDA_03`,`self_reference_min_shares`,`kw_avg_max`,`self_reference_avg_sharess`,`LDA_02`,`kw_avg_min`,`LDA_01`,`n_non_stop_unique_tokens`.  
+included in the following correlation plot with variables in () being
+renamed for this plot:
+`shares`,`kw_min_avg`,`kw_max_avg`,`LDA_03`,`self_reference_min_shares`(`srmin_shares`),`kw_avg_max`,`self_reference_avg_sharess`(`sravg_shares`),`LDA_02`,`kw_avg_min`,`LDA_01`,`n_non_stop_unique_tokens`(`n_nstop_utokens`).  
 The plot shows correlation with the response variable `shares` and the
 other various combinations. Larger circles indicate stronger positive
 (blue) or negative (red) correlation with correlation values on the
 lower portion of the plot.
 
 ``` r
-Correlation<-cor(select(channelData, shares, kw_min_avg,
-        kw_max_avg, LDA_03, self_reference_min_shares,
-        kw_avg_max, self_reference_avg_sharess, LDA_02,
-        kw_avg_min, LDA_01, n_non_stop_unique_tokens),
+##Reduce variable name length for later plotting
+## Otherwise var names overwrite Title no matter
+##  how many other size tweaks were made
+corrData<-channelData %>% 
+  mutate(sravg_shares=self_reference_avg_sharess,
+         srmin_shares=self_reference_min_shares,
+         n_nstop_utokens=n_non_stop_unique_tokens)
+
+Correlation<-cor(select(corrData, shares, kw_min_avg,
+        kw_max_avg, LDA_03, srmin_shares,
+        kw_avg_max, sravg_shares, LDA_02,
+        kw_avg_min, LDA_01, n_nstop_utokens),
         method = "spearman")
 
-
-corrplot(Correlation,type="upper",tl.pos="lt", tl.cex = .75)
+corrplot(Correlation,type="upper",tl.pos="lt", tl.cex = .70)
 corrplot(Correlation,type="lower",method="number",
-         add=TRUE,diag=FALSE,tl.pos="n",tl.cex = .75,number.cex = .75)
+         add=TRUE,diag=FALSE,tl.pos="n",tl.cex = .70,number.cex = .75,
+         title = 
+           "Correlation Plot of Shares and Variables of Interest",
+         mar=c(0,0,.50,0),cex.main = .75)
 ```
 
 ![](images/world/corrplot-1.png)<!-- -->
@@ -244,11 +255,15 @@ corrplot(Correlation,type="lower",method="number",
 ``` r
 ###this one is in progress, hopefully a scatter plot
 g<-ggplot(data = channelData,
-          aes(x= avg_negative_polarity,y=shares))
+          aes(x= kw_max_avg,y=shares))
 g + geom_point(aes(color=as.factor(is_weekend))) +
-  scale_y_continuous(trans = "pseudo_log")
+  geom_smooth(method = lm) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(labels = scales::comma)
   
-  scale_y_continuous(labels = scales::comma) 
+#  scale_y_continuous(labels = scales::comma) 
+
+#  scale_y_continuous(trans = "pseudo_log")
 ```
 
 ``` r
