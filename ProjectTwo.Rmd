@@ -335,7 +335,7 @@ channelTest <-channelData[-dataIndex,]
 ```
 
 
-```{r train linear regression model one}
+```{r train linear regression model one, cache=TRUE}
 # Seeing "Error in summary.connection(connection) : invalid connection" after
 # previous parallel computing runs, stopCluster(cl) may not be working as expected
 cl <- makePSOCKcluster(6)
@@ -362,12 +362,12 @@ postResample(predictLM1, obs = channelTest$shares)
 ```
 
 
-```{r train linear regression model two}
+```{r train linear regression model two, cache=TRUE}
 
 ```
 
 
-```{r train random forest model, eval=FALSE}
+```{r train random forest model, eval=FALSE, cache=TRUE}
 
 ##without parallel code this was still running after 30 minutes so tried parallel next
 
@@ -394,7 +394,7 @@ rfFit
 ```
 
 
-```{r train boosted tree model}
+```{r train boosted tree model, cache=TRUE}
 # Seeing "Error in summary.connection(connection) : invalid connection"
 # if I don't re-allocate cores for parallel computing
 cl <- makePSOCKcluster(6)
