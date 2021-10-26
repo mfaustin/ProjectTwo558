@@ -50,6 +50,7 @@ title: "Analysis for the `r currentChannel` Channel"
    library(lares)
    library(treemapify)
    library(rvest)
+   library(corrplot)
 ```
 
 ```{r import data, message=FALSE}
@@ -99,7 +100,7 @@ topURL %>% select(shares, title) %>% kable(col.names = c("Shares", "Article titl
 ```
 
 
-Two variables - `url` and `timedelta` - are non-predictive and have been removed. The remaining `r ncol(channelData)` variables comprise `r nrow(channelData)` observations, which makes up `r round(nrow(channelData)/nrow(fullData)*100, 1)` of the original data set. Fernandes et al., who sourced the data, concentrated on article characteristics such as verbosity and the polarity of content, publication day, the quantity of included media, and keyword attributes [@10.1007/978-3-319-23485-4_53]. A subset of these variables and the correlations between them are explored in subsequent sections.       
+Two variables - `url` and `timedelta` - are non-predictive and have been removed. The remaining `r ncol(channelData)` variables comprise `r nrow(channelData)` observations, which makes up `r round(nrow(channelData)/nrow(fullData)*100, 1)` percent of the original data set. Fernandes et al., who sourced the data, concentrated on article characteristics such as verbosity and the polarity of content, publication day, the quantity of included media, and keyword attributes [@10.1007/978-3-319-23485-4_53]. A subset of these variables and the correlations between them are explored in subsequent sections.       
 
 The broader purpose of this analysis is predicated on using supervised learning to predict a target variable - `shares`. To this end, the final sections outline four unique models for conducting such predictions and an assessment of their relative performance. Two models are rooted in multiple linear regression analysis, which assesses relationships between a response variable and two or more predictors. The remaining models are based on random forest and boosted tree techniques. The random forest method averages results from multiple decision trees which are fitted with a random parameter subset. The boosted tree method spurns averages in favor of results that stem from weighted iterations [@2021].             
 
@@ -209,12 +210,25 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
 
 ```
 
+Fernandes et al 
 
-```{r corrplot or ggpairs}
+```{r corrplot}
 
-#depending on whether dr. post gives ok to do corrplot I'll do one of these for my 3rd graph
+Correlation<-cor(select(channelData, shares, kw_min_avg,
+        kw_max_avg, LDA_03, self_reference_min_shares,
+        kw_avg_max, self_reference_avg_sharess, LDA_02,
+        kw_avg_min, LDA_01, n_non_stop_unique_tokens),
+        method = "spearman")
+
+
+corrplot(Correlation,type="upper",tl.pos="lt", tl.cex = .75)
+corrplot(Correlation,type="lower",method="number",
+         add=TRUE,diag=FALSE,tl.pos="n",tl.cex = .75,number.cex = .75)
 
 ```
+
+
+
 
 ```{r bar plot}
 ## Bar plot placeholder

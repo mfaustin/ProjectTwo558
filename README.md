@@ -20,6 +20,8 @@ project and/or create the linked channel documents.
     
 -   `caret` The caret package is used for working with data and models.    
 
+-   `corrplot` The corrplot package is used to produce a visual correlation matrix.  
+
 -   `knitr` The knitr package is used for document image handling.  
 
 -   `rmarkdown` The rmarkdown package is used by a render program to
