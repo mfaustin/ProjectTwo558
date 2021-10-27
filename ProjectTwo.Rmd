@@ -8,7 +8,7 @@ params:
 ---
 
 
-```{r image setup, include=FALSE}
+```{r channel setups, include=FALSE}
 
 ##For markdown automation need a different 
 ##  image and cache folder 
@@ -40,7 +40,7 @@ if (params$channel=="data_channel_is_bus") {
                         cache.path = "cache/world/")
   currentChannel<-"World"
 } 
-#knitr::opts_chunk$set(fig.path = "images/")
+
 
 ```
 
@@ -371,6 +371,8 @@ avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))
 
 ## Modeling  
 
+### Splitting Data  
+
 ```{r splitting data}
 
 #Using set.seed per suggestion so that work will be reproducible
@@ -383,6 +385,7 @@ channelTest <-channelData[-dataIndex,]
 
 ```
 
+### Linear Regression Models  
 
 ```{r train linear regression model one, cache=TRUE}
 # Seeing "Error in summary.connection(connection) : invalid connection" after
@@ -434,41 +437,46 @@ stopCluster(cl)
 lmFit2
 
 ```
+### Random Forest Model  
+
+Random forest models 
 
 
 ```{r train random forest model, cache=TRUE}
 
-##without parallel code this was still running after 30 minutes so tried parallel next and got runtime down to around 20 minutes using mtry 1:20
-
-##Other mtry values were tested but none of them ran in less than 30 minutes
-
-##Repeatedcv was also tried but those also took more than 30 minutes
-
-##Went with the 20 minute option because these need to run 6 total times (once per channel)
-
+##Run time presented a challenge so parallel processing was used
 ##Followed Parallel instructions on caret page
 ##   https://topepo.github.io/caret/parallel-processing.html
 
+##Various mtry values were tried with a 20 minute runtime goal
+##  A 20 minute per channel runtime corresponds 
+##  to a total of about 2 hours model fit for all 6 channels
+
+##mtry 1:30 was chosen because it was close to 20 minutes
+##mtry 1:20 had 10 minute runtime and 1:30 took 30 minutes
+
+##repeatedcv was tried but took over 30 minutes 
+## thus repeats were not used
 
 
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-rfFit <- train(shares ~ ., data = channelData,
+rfFit <- train(shares ~ ., data = channelTrain,
                method = "rf",
                preProcess = c("center", "scale"),
                trControl = trainControl(method = "cv",
                                 number = 5),
-               tuneGrid = data.frame(mtry = 1:20))
+               tuneGrid = data.frame(mtry = 1:30))
 
 stopCluster(cl)
 
 rfFit
 
 
-
 ```
 
+### Boosted Tree Model  
 
 ```{r train boosted tree model, cache=TRUE}
 # Seeing "Error in summary.connection(connection) : invalid connection"
@@ -530,8 +538,9 @@ This part needs to be automated.  Maybe create a function and iterate over these
 ```
 
 
-```{r test random forest model}
-
+```{r test random forest model, eval=FALSE}
+predictRF <- predict(rfFit, newdata = channelTest)
+postResample(predictRF, channelTest$shares)
 ```
 
 
