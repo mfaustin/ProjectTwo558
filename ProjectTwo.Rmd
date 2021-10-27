@@ -538,9 +538,10 @@ This part needs to be automated.  Maybe create a function and iterate over these
 ```
 
 
-```{r test random forest model, eval=FALSE}
+```{r test random forest model}
 predictRF <- predict(rfFit, newdata = channelTest)
-postResample(predictRF, channelTest$shares)
+RMSERF<-postResample(predictRF, channelTest$shares)["RMSE"]
+RMSERF
 ```
 
 
