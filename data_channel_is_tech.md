@@ -255,8 +255,11 @@ corrplot(Correlation,type="lower",method="number",
 
 The following two scatterplots illustrate the relationship between
 response article shares `shares` and predictor average keyword (max
-shares) `kw_max_ave`. Both scatterplots plot these variables and add a
-simple linear regression line to the graph.
+shares) `kw_max_ave`. `kw_max_ave` was chosen because it was one of the
+potential predictors examined in the previous correlation plot.
+
+Both scatterplots plot these variables and add a simple linear
+regression line to the graph.
 
 For either graph, an upward relationship indicates higher average
 keyword values tend towards more article shares. A negative relation
@@ -468,28 +471,89 @@ postResample(predictLM1, obs = channelTest$shares)
 ```
 
 ``` r
-##without parallel code this was still running after 30 minutes so tried parallel next
+cl <- makePSOCKcluster(6)
+registerDoParallel(cl)
 
-##my pc has 8 cores so chose 5
+# Linear regression 
+# Using same vars as in corrplot 
+lmFit2 <- train(shares ~ kw_min_avg +
+        kw_max_avg + LDA_03 + self_reference_min_shares +
+        kw_avg_max + self_reference_avg_sharess + LDA_02 +
+        kw_avg_min + LDA_01 + n_non_stop_unique_tokens, 
+               data = channelTrain,
+               method = "lm",
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", 
+                                        number = 10))
+
+
+stopCluster(cl)
+
+lmFit2
+```
+
+``` r
+##without parallel code this was still running after 30 minutes so tried parallel next and got runtime down to around 20 minutes using mtry 1:20
+
+##Other mtry values were tested but none of them ran in less than 30 minutes
+
+##Repeatedcv was also tried but those also took more than 30 minutes
+
+##Went with the 20 minute option because these need to run 6 total times (once per channel)
 
 ##Followed Parallel instructions on caret page
 ##   https://topepo.github.io/caret/parallel-processing.html
-##Even then it took 10 minutest to run
-## and picked m=1 so not sure this is working correctly yet?
 
-cl <- makePSOCKcluster(5)
+
+
+cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
 rfFit <- train(shares ~ ., data = channelData,
                method = "rf",
                trControl = trainControl(method = "cv",
                                 number = 5),
-               tuneGrid = data.frame(mtry = 1:15))
+               tuneGrid = data.frame(mtry = 1:20))
 
 stopCluster(cl)
 
 rfFit
 ```
+
+    ## Random Forest 
+    ## 
+    ## 7346 samples
+    ##   52 predictor
+    ## 
+    ## No pre-processing
+    ## Resampling: Cross-Validated (5 fold) 
+    ## Summary of sample sizes: 5876, 5878, 5877, 5876, 5877 
+    ## Resampling results across tuning parameters:
+    ## 
+    ##   mtry  RMSE      Rsquared    MAE     
+    ##    1    7214.485  0.03487323  2306.956
+    ##    2    7243.169  0.02848636  2345.245
+    ##    3    7277.229  0.02567932  2367.129
+    ##    4    7315.175  0.02296625  2385.603
+    ##    5    7359.980  0.02159335  2395.090
+    ##    6    7465.748  0.01658877  2431.558
+    ##    7    7472.060  0.01750938  2436.506
+    ##    8    7504.485  0.01785901  2434.023
+    ##    9    7553.522  0.01564947  2447.548
+    ##   10    7634.801  0.01474208  2469.634
+    ##   11    7626.131  0.01492683  2464.517
+    ##   12    7659.974  0.01454976  2470.654
+    ##   13    7734.079  0.01260208  2477.315
+    ##   14    7739.738  0.01313151  2487.721
+    ##   15    7741.994  0.01308915  2497.486
+    ##   16    7871.549  0.01135769  2500.375
+    ##   17    7869.275  0.01190044  2496.549
+    ##   18    7983.762  0.01109096  2509.314
+    ##   19    7849.654  0.01222869  2505.711
+    ##   20    7871.106  0.01126869  2504.198
+    ## 
+    ## RMSE was used to select the optimal model using the smallest value.
+    ## The final value used for the model was mtry = 1.
 
 ``` r
 # Seeing "Error in summary.connection(connection) : invalid connection"
