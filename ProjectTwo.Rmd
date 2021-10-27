@@ -438,16 +438,18 @@ lmFit2
 
 ```{r train random forest model, cache=TRUE}
 
-##without parallel code this was still running after 30 minutes so tried parallel next and got runtime down to around 50 minutess
+##without parallel code this was still running after 30 minutes so tried parallel next and got runtime down to around 20 minutes using mtry 1:20
 
-##Other mtry values were tried but none of them ran in less than 30 minutes
+##Other mtry values were tested but none of them ran in less than 30 minutes
 
-##Repeatedcv was also tried but those also took more than 30 minutes 
+##Repeatedcv was also tried but those also took more than 30 minutes
+
+##Went with the 20 minute option because these need to run 6 total times (once per channel)
 
 ##Followed Parallel instructions on caret page
 ##   https://topepo.github.io/caret/parallel-processing.html
 
-Sys.time()
+
 
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
@@ -462,7 +464,7 @@ stopCluster(cl)
 
 rfFit
 
-Sys.time()
+
 
 ```
 
