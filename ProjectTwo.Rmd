@@ -373,6 +373,8 @@ avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))
 
 ### Splitting Data  
 
+Per project requirements, the data for each channel are split with 70% of the data becoming training data and 30% of the data becoming test data.  
+
 ```{r splitting data}
 
 #Using set.seed per suggestion so that work will be reproducible
@@ -386,6 +388,8 @@ channelTest <-channelData[-dataIndex,]
 ```
 
 ### Linear Regression Models  
+
+Mark needs to add explanation of linear models required for project.  
 
 ```{r train linear regression model one, cache=TRUE}
 # Seeing "Error in summary.connection(connection) : invalid connection" after
@@ -439,7 +443,8 @@ lmFit2
 ```
 ### Random Forest Model  
 
-Random forest models 
+Mark in process of adding RF explanation  
+Random forest models  
 
 
 ```{r train random forest model, cache=TRUE}
@@ -475,6 +480,15 @@ rfFit
 
 
 ```
+
+
+```{r random forest importance plot, eval=FALSE}
+
+rfImp <- varImp(rfFit, scale = FALSE)
+plot(rfImp,top = 10, main="Random Forest Model/nTop 10 Importance Plot")
+
+```
+
 
 ### Boosted Tree Model  
 
@@ -526,7 +540,7 @@ postResample(predictGBM, obs = channelTest$shares)
 
 ## Model Comparisons  
 
-This part needs to be automated.  We will have RMSE for each model and need to find the lowest RMSE per channel to chose as best model for that channel.  
+Maks,model comparison needs to be automated.  We will have RMSE for each model and need to find the lowest RMSE per channel to chose as best model for that channel.  
 
 ```{r test linear regression model one}
 
