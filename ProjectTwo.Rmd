@@ -456,6 +456,7 @@ registerDoParallel(cl)
 
 rfFit <- train(shares ~ ., data = channelData,
                method = "rf",
+               preProcess = c("center", "scale"),
                trControl = trainControl(method = "cv",
                                 number = 5),
                tuneGrid = data.frame(mtry = 1:20))
