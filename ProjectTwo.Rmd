@@ -455,7 +455,7 @@ Random forest models
 ##mtry 1:30 was chosen because it was close to 20 minutes
 ##mtry 1:20 had 10 minute runtime and 1:30 took 30 minutes
 
-##repeatedcv was tried but took over 30 minutes 
+##repeatedcv was evaluated but took over 30 minutes 
 ## thus repeats were not used
 
 
@@ -526,7 +526,7 @@ postResample(predictGBM, obs = channelTest$shares)
 
 ## Model Comparisons  
 
-This part needs to be automated.  Maybe create a function and iterate over these if they are similar?
+This part needs to be automated.  We will have RMSE for each model and need to find the lowest RMSE per channel to chose as best model for that channel.  
 
 ```{r test linear regression model one}
 
@@ -535,13 +535,19 @@ This part needs to be automated.  Maybe create a function and iterate over these
 
 ```{r test linear regression model two}
 
+predictLM2 <- predict(lmFit2, newdata = channelTest)
+RMSELM2<-postResample(predictLM2, channelTest$shares)["RMSE"]
+RMSELM2
+
 ```
 
 
 ```{r test random forest model}
+
 predictRF <- predict(rfFit, newdata = channelTest)
 RMSERF<-postResample(predictRF, channelTest$shares)["RMSE"]
 RMSERF
+
 ```
 
 
