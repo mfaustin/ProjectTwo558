@@ -495,6 +495,8 @@ plot(rfImp,top = 10, main="Random Forest Model\nTop 10 Importance Plot")
 
 ### Boosted Tree Model  
 
+Boosting is a general method whereby decision trees are grown sequentially using residuals (the differences between observed values and predicted values of a variable) as the response. Initial prediction values start at $0$ for all combinations of predictors, so that the first set of residuals matches the observed values in our data. To mitigate low bias and high variance, contributions from subsequent trees are scaled with a shrinkage parameter, $\lambda$. The value of this parameter is generally small (0.01 or 0.001), which results in slow tree growth and tampers overfitting [@2021]. 
+
 ```{r train boosted tree model, cache=TRUE}
 # Seeing "Error in summary.connection(connection) : invalid connection"
 # if I don't re-allocate cores for parallel computing
