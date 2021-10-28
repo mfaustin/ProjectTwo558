@@ -463,25 +463,6 @@ lmFit1 <- train(shares ~ ., data = channelTrain,
 
 
 stopCluster(cl)
-
-# Predict using test data
-predictLM1 <- predict(lmFit1, newdata = channelTest)
-```
-
-    ## Warning in predict.lm(modelFit, newdata): prediction from a rank-deficient fit may
-    ## be misleading
-
-``` r
-# Metrics
-postResample(predictLM1, obs = channelTest$shares)
-```
-
-    ##         RMSE     Rsquared          MAE 
-    ## 4.153777e+03 1.710205e-02 2.336041e+03
-
-``` r
-# Only RMSE
-# RMSE(channelTest$shares, predictLM1)
 ```
 
 ``` r
@@ -588,7 +569,7 @@ rfFit
     ## The final value used for the model was mtry = 1.
 
 ``` r
-rfImp <- varImp(rfFit, scale = FALSE)
+rfImp <- varImp(rfFit, scale = TRUE)
 plot(rfImp,top = 10, main="Random Forest Model\nTop 10 Importance Plot")
 ```
 
@@ -613,19 +594,19 @@ boostedTreeFit <- train(shares ~ ., data = channelTrain,
 ```
 
     ## Iter   TrainDeviance   ValidDeviance   StepSize   Improve
-    ##      1 109328140.2557             nan     0.1000 136052.2538
-    ##      2 107444636.1133             nan     0.1000 -45948.8445
-    ##      3 107279919.3104             nan     0.1000 44967.9161
-    ##      4 106328385.6857             nan     0.1000 52004.9978
-    ##      5 105402792.2034             nan     0.1000 -196588.4208
-    ##      6 105182874.7504             nan     0.1000 59750.8857
-    ##      7 104954390.2924             nan     0.1000 -73052.6044
-    ##      8 104904956.1952             nan     0.1000 -377791.8046
-    ##      9 104154802.4660             nan     0.1000 -245259.1187
-    ##     10 103817935.6854             nan     0.1000 86957.8001
-    ##     20 101065124.3238             nan     0.1000 -23587.7057
-    ##     40 94523531.8051             nan     0.1000 -602114.8567
-    ##     50 91593882.3475             nan     0.1000 -68573.4465
+    ##      1 109381234.3456             nan     0.1000 42287.7480
+    ##      2 109259302.9854             nan     0.1000 82440.1147
+    ##      3 107952878.6786             nan     0.1000 -119661.0532
+    ##      4 107762705.7614             nan     0.1000 158637.9618
+    ##      5 106714403.7539             nan     0.1000 -246805.6528
+    ##      6 106080384.9496             nan     0.1000 -194422.0950
+    ##      7 105890357.8759             nan     0.1000 56655.2367
+    ##      8 105239480.8539             nan     0.1000 -679207.0937
+    ##      9 105335339.2685             nan     0.1000 -389205.4470
+    ##     10 104849717.9119             nan     0.1000 -688884.9974
+    ##     20 100299173.2114             nan     0.1000 545814.0687
+    ##     40 93135195.2414             nan     0.1000 -567537.8741
+    ##     50 91268088.5601             nan     0.1000 -750096.1446
 
 ``` r
 # Define tuning parameters based on $bestTune from the permutations above
@@ -645,38 +626,22 @@ bestBoostedTree <- train(shares ~ ., data = channelTrain,
 ```
 
     ## Iter   TrainDeviance   ValidDeviance   StepSize   Improve
-    ##      1 108006016.7478             nan     0.1000 39912.1272
-    ##      2 106668857.1352             nan     0.1000 -662462.9202
-    ##      3 105734963.7856             nan     0.1000 -641481.4072
-    ##      4 105077350.9057             nan     0.1000 -526739.9132
-    ##      5 104654575.4783             nan     0.1000 -581867.3609
-    ##      6 104545292.0889             nan     0.1000 -509155.2449
-    ##      7 104007396.9741             nan     0.1000 441266.0030
-    ##      8 103517617.4807             nan     0.1000 528760.7865
-    ##      9 101863829.2781             nan     0.1000 -199238.7014
-    ##     10 101593275.9125             nan     0.1000 162580.9210
-    ##     20 98430981.2300             nan     0.1000 -1195363.5657
-    ##     40 89264734.6474             nan     0.1000 128042.0592
-    ##     50 81072964.5967             nan     0.1000 -496146.6447
+    ##      1 109371861.0234             nan     0.1000 125488.8575
+    ##      2 109195951.9977             nan     0.1000 86584.1282
+    ##      3 107679946.2162             nan     0.1000 -11333.3685
+    ##      4 107557157.8583             nan     0.1000 111767.5956
+    ##      5 106687455.2880             nan     0.1000 -247430.8891
+    ##      6 106583581.1659             nan     0.1000 63981.2143
+    ##      7 106413608.5233             nan     0.1000 -8816.7682
+    ##      8 106549935.1270             nan     0.1000 -397646.4473
+    ##      9 105765194.0504             nan     0.1000 -329999.9111
+    ##     10 105254217.1698             nan     0.1000 -302624.7464
+    ##     20 101543105.2993             nan     0.1000 248551.4841
+    ##     40 95448924.2069             nan     0.1000 -604932.9373
+    ##     50 89917072.2582             nan     0.1000 -426088.9426
 
 ``` r
 stopCluster(cl)
-
-# summary(bestBoostedTree)
-
-# Predict using test data
-predictGBM <- predict(bestBoostedTree, newdata = channelTest)
-
-# Metrics
-postResample(predictGBM, obs = channelTest$shares)
-```
-
-    ##         RMSE     Rsquared          MAE 
-    ## 4.365746e+03 7.474453e-03 2.224031e+03
-
-``` r
-# Only RMSE
-# RMSE(channelTest$shares, predictGBM)
 ```
 
 ## Model Comparisons
@@ -686,13 +651,36 @@ model and need to find the lowest RMSE per channel to chose as best
 model for that channel.
 
 ``` r
+# Predict using test data
+predictLM1 <- predict(lmFit1, newdata = channelTest)
+```
+
+    ## Warning in predict.lm(modelFit, newdata): prediction from a rank-deficient fit may
+    ## be misleading
+
+``` r
+# Metrics
+RMSELM1 <- postResample(predictLM1, obs = channelTest$shares)["RMSE"][[1]]
+str(RMSELM1)
+```
+
+    ##  num 4154
+
+``` r
+modelPerformance <- tibble(RMSE = RMSELM1, Model = "Linear regression 1")
+```
+
+``` r
 predictLM2 <- predict(lmFit2, newdata = channelTest)
-RMSELM2<-postResample(predictLM2, channelTest$shares)["RMSE"]
+RMSELM2<-postResample(predictLM2, channelTest$shares)["RMSE"][[1]]
 RMSELM2
 ```
 
-    ##     RMSE 
-    ## 4819.486
+    ## [1] 4819.486
+
+``` r
+modelPerformance <- add_row(modelPerformance, RMSE = RMSELM2, Model = "Linear regression 2")
+```
 
 ``` r
 predictRF <- predict(rfFit, newdata = channelTest)
@@ -702,6 +690,42 @@ RMSERF
 
     ##     RMSE 
     ## 3869.007
+
+``` r
+modelPerformance <- add_row(modelPerformance, RMSE = RMSERF, Model = "Random forest")
+```
+
+``` r
+#summary(bestBoostedTree)
+
+# Predict using test data
+predictGBM <- predict(bestBoostedTree, newdata = channelTest)
+
+# Metrics
+RMSEGBM <- postResample(predictGBM, obs = channelTest$shares)["RMSE"]
+RMSEGBM
+```
+
+    ##     RMSE 
+    ## 4332.354
+
+``` r
+modelPerformance <- add_row(modelPerformance, RMSE = RMSEGBM, Model = "Boosted tree")
+```
+
+``` r
+# Select row with lowest value of RMSE.
+selectModel <- modelPerformance %>% slice_min(RMSE)
+selectModel
+```
+
+    ## # A tibble: 1 x 2
+    ##    RMSE Model        
+    ##   <dbl> <chr>        
+    ## 1 3869. Random forest
+
+Based on the output above, the Random forest model yields the lowest
+RMSE, 3869.0074517.
 
 ## References
 

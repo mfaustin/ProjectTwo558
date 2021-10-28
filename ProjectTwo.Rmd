@@ -475,7 +475,7 @@ rfFit
 
 ```{r random forest importance plot}
 
-rfImp <- varImp(rfFit, scale = FALSE)
+rfImp <- varImp(rfFit, scale = TRUE)
 plot(rfImp,top = 10, main="Random Forest Model\nTop 10 Importance Plot")
 
 ```
