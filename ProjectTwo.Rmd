@@ -406,15 +406,6 @@ lmFit1 <- train(shares ~ ., data = channelTrain,
 
 
 stopCluster(cl)
-
-# Predict using test data
-predictLM1 <- predict(lmFit1, newdata = channelTest)
-
-# Metrics
-postResample(predictLM1, obs = channelTest$shares)
-
-# Only RMSE
-# RMSE(channelTest$shares, predictLM1)
 ```
 
 
@@ -524,25 +515,22 @@ bestBoostedTree <- train(shares ~ ., data = channelTrain,
 
 
 stopCluster(cl)
-
-# summary(bestBoostedTree)
-
-# Predict using test data
-predictGBM <- predict(bestBoostedTree, newdata = channelTest)
-
-# Metrics
-postResample(predictGBM, obs = channelTest$shares)
-
-# Only RMSE
-# RMSE(channelTest$shares, predictGBM)
 ```
 
 
 ## Model Comparisons  
 
-Maks,model comparison needs to be automated.  We will have RMSE for each model and need to find the lowest RMSE per channel to chose as best model for that channel.  
+Maks,model comparison needs to be automated.  We will have RMSE for each model and need to find the lowest RMSE per channel to chose as best model for that channel. 
 
 ```{r test linear regression model one}
+# Predict using test data
+predictLM1 <- predict(lmFit1, newdata = channelTest)
+
+# Metrics
+RMSELM1 <- postResample(predictLM1, obs = channelTest$shares)["RMSE"][[1]]
+str(RMSELM1)
+
+modelPerformance <- tibble(RMSE = RMSELM1, Model = "Linear regression 1")
 
 ```
 
@@ -550,9 +538,10 @@ Maks,model comparison needs to be automated.  We will have RMSE for each model a
 ```{r test linear regression model two}
 
 predictLM2 <- predict(lmFit2, newdata = channelTest)
-RMSELM2<-postResample(predictLM2, channelTest$shares)["RMSE"]
+RMSELM2<-postResample(predictLM2, channelTest$shares)["RMSE"][[1]]
 RMSELM2
 
+modelPerformance <- add_row(modelPerformance, RMSE = RMSELM2, Model = "Linear regression 2")
 ```
 
 
@@ -562,12 +551,30 @@ predictRF <- predict(rfFit, newdata = channelTest)
 RMSERF<-postResample(predictRF, channelTest$shares)["RMSE"]
 RMSERF
 
+modelPerformance <- add_row(modelPerformance, RMSE = RMSERF, Model = "Random forest")
 ```
 
 
 ```{r test boosted tree model}
+#summary(bestBoostedTree)
 
+# Predict using test data
+predictGBM <- predict(bestBoostedTree, newdata = channelTest)
+
+# Metrics
+RMSEGBM <- postResample(predictGBM, obs = channelTest$shares)["RMSE"]
+RMSEGBM
+
+modelPerformance <- add_row(modelPerformance, RMSE = RMSEGBM, Model = "Boosted tree")
 ```
+
+```{r model comparison}
+# Select row with lowest value of RMSE.
+selectModel <- modelPerformance %>% slice_min(RMSE)
+selectModel
+```
+
+Based on the output above, the `r selectModel[2]` model yields the lowest RMSE, `r selectModel[1]`. 
 
 ## References 
 
