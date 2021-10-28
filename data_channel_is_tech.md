@@ -6,7 +6,7 @@ Due 10/31/2021
 -   [Introduction](#introduction)
 -   [Summarizations](#summarizations)
     -   [Numerical Summaries](#numerical-summaries)
-    -   [Contingency Tables](#contingency-tables)
+    -   [Contingency Table](#contingency-table)
     -   [Plots](#plots)
 -   [Modeling](#modeling)
     -   [Splitting Data](#splitting-data)
@@ -24,7 +24,7 @@ fullData<-read_csv("./data/OnlineNewsPopularity.csv")
 reduceVarsData<-fullData %>% select(-url,-timedelta)
 #Are there other vars we do not need to use??
 
-#test code to be removed later
+#test code for pre automation
 #params$channel<-"data_channel_is_bus"
 
 #filter by the current params channel
@@ -170,7 +170,7 @@ kable(covarianceDF)
 | global\_rate\_negative\_words | rate\_positive\_words         |   -0.742238 | &lt; 2.22e-16 |
 | n\_tokens\_content            | n\_unique\_tokens             |   -0.734905 | &lt; 2.22e-16 |
 
-### Contingency Tables
+### Contingency Table
 
 The following contingency table displays counts and sums for the number
 of article shares within given ranges by the day of week shared. Share
@@ -446,7 +446,22 @@ channelTest <-channelData[-dataIndex,]
 
 ### Linear Regression Models
 
-Mark needs to add explanation of linear models required for project.
+Linear regression models describe a linear relationship between a
+response variable and one or more explanatory variables. Models with one
+explanatory variable are called simple linear regression models and
+models with more than one explanatory variable are called multiple
+linear regression models. Multiple linear regression models can include
+polynomial and interaction terms. Each explanatory variable has an
+associated estimated parameter. All linear regression models are linear
+in the parameters.
+
+For linear regression, explanatory variables can be continuous or
+categorical. However, response variables are only continuous for linear
+regression models.
+
+Linear regression models are fit with training data by minimizing the
+sum of squared errors. Model fitting results in a line for simple linear
+regression and a saddle for multiple linear regression.
 
 ``` r
 # Seeing "Error in summary.connection(connection) : invalid connection" after
@@ -471,6 +486,7 @@ registerDoParallel(cl)
 
 # Linear regression 
 # Using same vars as in corrplot 
+# See corrplot for why these were chosen
 lmFit2 <- train(shares ~ kw_min_avg +
         kw_max_avg + LDA_03 + self_reference_min_shares +
         kw_avg_max + self_reference_avg_sharess + LDA_02 +
@@ -489,8 +505,26 @@ lmFit2
 
 ### Random Forest Model
 
-Mark in process of adding RF explanation  
-Random forest models
+Random forest models aggregate results from many sample decision trees.
+Those sample trees are produced using bootstrap samples created using
+resampling with replacement. A tree is trained on each bootstrap sample,
+resulting in a prediction based on that training sample data. Results
+from all bootstrap samples are averaged to arrive at a final prediction.
+
+Both bagging and random forest methods use bootstrap sampling with
+decision trees. However, bagging includes all predictors which can lead
+to less reduction in variance when strong predictors exist. Unlike
+bagging, random forests do not use all predictors but use a random
+subset of predictors for each bootstrap tree fit. Random forests usually
+have a better fit than bagging models.
+
+In this particular case, the response `shares` is continuous and we are
+working with regression trees. The `mtry` tuning parameter controls how
+many random predictors are used in the bootstrap samples. An `mtry` of 1
+to 30 was chosen as a way to evaluate up to 30 predictors. These values
+were chosen to work within available computing constraints. Five fold
+cross validation is used to choose the optimal mtry value corresponding
+to the lowest RMSE.
 
 ``` r
 ##Run time presented a challenge so parallel processing was used
@@ -567,6 +601,10 @@ rfFit
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was mtry = 1.
+
+After fitting the random forest model, the following variable importance
+plot is created. The top ten most important predictors are plotted using
+a scale of 0 to 100.
 
 ``` r
 rfImp <- varImp(rfFit, scale = TRUE)
