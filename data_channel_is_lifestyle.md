@@ -9,6 +9,10 @@ Due 10/31/2021
     -   [Contingency Tables](#contingency-tables)
     -   [Plots](#plots)
 -   [Modeling](#modeling)
+    -   [Splitting Data](#splitting-data)
+    -   [Linear Regression Models](#linear-regression-models)
+    -   [Random Forest Model](#random-forest-model)
+    -   [Boosted Tree Model](#boosted-tree-model)
 -   [Model Comparisons](#model-comparisons)
 -   [References](#references)
 
@@ -423,6 +427,12 @@ avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))
 
 ## Modeling
 
+### Splitting Data
+
+Per project requirements, the data for each channel are split with 70%
+of the data becoming training data and 30% of the data becoming test
+data.
+
 ``` r
 #Using set.seed per suggestion so that work will be reproducible
 set.seed(20)
@@ -432,6 +442,10 @@ dataIndex <-createDataPartition(channelData$shares, p = 0.7, list = FALSE)
 channelTrain <-channelData[dataIndex,]
 channelTest <-channelData[-dataIndex,]
 ```
+
+### Linear Regression Models
+
+Mark needs to add explanation of linear models required for project.
 
 ``` r
 # Seeing "Error in summary.connection(connection) : invalid connection" after
@@ -491,29 +505,36 @@ stopCluster(cl)
 lmFit2
 ```
 
+### Random Forest Model
+
+Mark in process of adding RF explanation  
+Random forest models
+
 ``` r
-##without parallel code this was still running after 30 minutes so tried parallel next and got runtime down to around 20 minutes using mtry 1:20
-
-##Other mtry values were tested but none of them ran in less than 30 minutes
-
-##Repeatedcv was also tried but those also took more than 30 minutes
-
-##Went with the 20 minute option because these need to run 6 total times (once per channel)
-
+##Run time presented a challenge so parallel processing was used
 ##Followed Parallel instructions on caret page
 ##   https://topepo.github.io/caret/parallel-processing.html
 
+##Various mtry values were tried with a 20 minute runtime goal
+##  A 20 minute per channel runtime corresponds 
+##  to a total of about 2 hours model fit for all 6 channels
+
+##mtry 1:30 was chosen because it was close to 20 minutes
+##mtry 1:20 had 10 minute runtime and 1:30 took 30 minutes
+
+##repeatedcv was evaluated but took over 30 minutes 
+## thus repeats were not used
 
 
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-rfFit <- train(shares ~ ., data = channelData,
+rfFit <- train(shares ~ ., data = channelTrain,
                method = "rf",
                preProcess = c("center", "scale"),
                trControl = trainControl(method = "cv",
                                 number = 5),
-               tuneGrid = data.frame(mtry = 1:20))
+               tuneGrid = data.frame(mtry = 1:30))
 
 stopCluster(cl)
 
@@ -522,38 +543,55 @@ rfFit
 
     ## Random Forest 
     ## 
-    ## 2099 samples
+    ## 1472 samples
     ##   52 predictor
     ## 
     ## Pre-processing: centered (52), scaled (52) 
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1680, 1678, 1679, 1679, 1680 
+    ## Summary of sample sizes: 1178, 1176, 1178, 1177, 1179 
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  RMSE      Rsquared     MAE     
-    ##    1    8348.987  0.013687397  3322.989
-    ##    2    8395.806  0.014215432  3404.844
-    ##    3    8451.836  0.011273473  3448.300
-    ##    4    8512.629  0.012085575  3464.627
-    ##    5    8592.127  0.011561411  3508.302
-    ##    6    8647.649  0.009984293  3526.464
-    ##    7    8698.225  0.010213339  3539.037
-    ##    8    8776.717  0.010049093  3568.041
-    ##    9    8831.724  0.008844716  3581.721
-    ##   10    8866.491  0.009055425  3592.990
-    ##   11    8894.902  0.009566830  3602.913
-    ##   12    8951.359  0.009049094  3594.578
-    ##   13    8996.713  0.008829366  3620.455
-    ##   14    9083.532  0.010195105  3648.663
-    ##   15    9073.144  0.010008810  3636.848
-    ##   16    9063.947  0.009106234  3628.003
-    ##   17    9106.824  0.008327702  3652.440
-    ##   18    9165.773  0.010127568  3659.483
-    ##   19    9178.845  0.007884867  3660.177
-    ##   20    9206.782  0.008440508  3669.633
+    ##    1    7700.354  0.011448227  3257.875
+    ##    2    7767.243  0.010557108  3344.202
+    ##    3    7818.160  0.008819996  3361.536
+    ##    4    7863.695  0.008708639  3392.410
+    ##    5    7885.215  0.009835263  3415.104
+    ##    6    7903.022  0.010214064  3396.174
+    ##    7    7989.386  0.009209833  3452.842
+    ##    8    8044.493  0.007095766  3463.653
+    ##    9    8072.146  0.006458376  3464.451
+    ##   10    8133.106  0.006624797  3476.167
+    ##   11    8154.974  0.007672426  3486.552
+    ##   12    8140.628  0.010311884  3481.164
+    ##   13    8151.268  0.009191298  3482.209
+    ##   14    8219.685  0.007071879  3495.295
+    ##   15    8266.071  0.007106738  3499.214
+    ##   16    8272.007  0.007487571  3485.774
+    ##   17    8335.853  0.006336330  3522.780
+    ##   18    8343.314  0.007765418  3525.826
+    ##   19    8403.869  0.007720668  3517.991
+    ##   20    8406.939  0.006405060  3545.463
+    ##   21    8422.275  0.008047622  3516.312
+    ##   22    8451.770  0.006368502  3537.152
+    ##   23    8488.364  0.007367648  3524.590
+    ##   24    8454.638  0.006303017  3522.232
+    ##   25    8526.539  0.007246372  3520.831
+    ##   26    8582.794  0.006213899  3544.972
+    ##   27    8627.369  0.006609938  3544.678
+    ##   28    8647.981  0.006894932  3552.627
+    ##   29    8631.074  0.007435105  3541.756
+    ##   30    8678.797  0.006936974  3545.583
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was mtry = 1.
+
+``` r
+rfImp <- varImp(rfFit, scale = FALSE)
+plot(rfImp,top = 10, main="Random Forest Model\nTop 10 Importance Plot")
+```
+
+### Boosted Tree Model
 
 ``` r
 # Seeing "Error in summary.connection(connection) : invalid connection"
@@ -640,8 +678,27 @@ postResample(predictGBM, obs = channelTest$shares)
 
 ## Model Comparisons
 
-This part needs to be automated. Maybe create a function and iterate
-over these if they are similar?
+Maks,model comparison needs to be automated. We will have RMSE for each
+model and need to find the lowest RMSE per channel to chose as best
+model for that channel.
+
+``` r
+predictLM2 <- predict(lmFit2, newdata = channelTest)
+RMSELM2<-postResample(predictLM2, channelTest$shares)["RMSE"]
+RMSELM2
+```
+
+    ##     RMSE 
+    ## 8825.991
+
+``` r
+predictRF <- predict(rfFit, newdata = channelTest)
+RMSERF<-postResample(predictRF, channelTest$shares)["RMSE"]
+RMSERF
+```
+
+    ##     RMSE 
+    ## 8415.603
 
 ## References
 
