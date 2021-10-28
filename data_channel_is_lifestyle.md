@@ -591,6 +591,8 @@ rfImp <- varImp(rfFit, scale = FALSE)
 plot(rfImp,top = 10, main="Random Forest Model\nTop 10 Importance Plot")
 ```
 
+![](images/lifestyle/random%20forest%20importance%20plot-1.png)<!-- -->
+
 ### Boosted Tree Model
 
 ``` r
