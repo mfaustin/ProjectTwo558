@@ -540,8 +540,9 @@ predictLM1 <- predict(lmFit1, newdata = channelTest)
 
 # Metrics
 RMSELM1 <- postResample(predictLM1, obs = channelTest$shares)["RMSE"][[1]]
-str(RMSELM1)
+RMSELM1
 
+# Store value for model comparison
 modelPerformance <- tibble(RMSE = RMSELM1, Model = "Linear regression 1")
 
 ```
@@ -586,7 +587,7 @@ selectModel <- modelPerformance %>% slice_min(RMSE)
 selectModel
 ```
 
-Based on the output above, the `r selectModel[2]` model yields the lowest RMSE, `r selectModel[1]`. 
+Based on the preceding analyses with test data, the `r selectModel[2]` model yields the lowest RMSE - `r selectModel[1]`. 
 
 ## References 
 
