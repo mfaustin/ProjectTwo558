@@ -699,7 +699,8 @@ stopCluster(cl)
 ## Model Comparisons
 
 After models were fit with training data, we do predictions with testing
-data. Finally, RMSE metrics are extracted and compared
+data. Finally, RMSE metrics are extracted and compared. The model with
+lowest RMSE is presented as the winning model.
 
 ``` r
 # Predict using test data
