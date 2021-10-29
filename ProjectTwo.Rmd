@@ -60,15 +60,18 @@ title: "Analysis for the `r currentChannel` Channel"
    library(corrplot)
 ```
 
+## Data Import  
+
+Data was imported first to allow for a more automated introduction.  
+
 ```{r import data, message=FALSE}
 # Read all data into a tibble
 fullData<-read_csv("./data/OnlineNewsPopularity.csv")
 
 # Eliminate non-predictive variables
 reduceVarsData<-fullData %>% select(-url,-timedelta)
-#Are there other vars we do not need to use??
 
-#test code for pre automation
+#test code for pre markdown automation
 #params$channel<-"data_channel_is_bus"
 
 #filter by the current params channel
@@ -533,7 +536,7 @@ stopCluster(cl)
 
 ## Model Comparisons  
 
-Maks,model comparison needs to be automated.  We will have RMSE for each model and need to find the lowest RMSE per channel to chose as best model for that channel. 
+After models were fit with training data, we do predictions with testing data.  Finally, RMSE metrics are extracted and compared.  The model with lowest RMSE is presented as the winning model.  
 
 ```{r test linear regression model one}
 # Predict using test data
