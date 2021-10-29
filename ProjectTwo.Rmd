@@ -537,7 +537,7 @@ stopCluster(cl)
 
 ## Model Comparisons  
 
-Maks,model comparison needs to be automated.  We will have RMSE for each model and need to find the lowest RMSE per channel to chose as best model for that channel. 
+After models were fit with training data, we do predictions with testing data.  Finally, RMSE metrics are extracted and compared  
 
 ```{r test linear regression model one}
 # Predict using test data

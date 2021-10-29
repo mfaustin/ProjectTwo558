@@ -3,6 +3,7 @@ Analysis for the World Channel
 Maks Nikiforov and Mark Austin
 Due 10/31/2021
 
+-   [Data Import](#data-import)
 -   [Introduction](#introduction)
 -   [Summarizations](#summarizations)
     -   [Numerical Summaries](#numerical-summaries)
@@ -16,15 +17,18 @@ Due 10/31/2021
 -   [Model Comparisons](#model-comparisons)
 -   [References](#references)
 
+## Data Import
+
+Data was imported first to allow for a more automated introduction.
+
 ``` r
 # Read all data into a tibble
 fullData<-read_csv("./data/OnlineNewsPopularity.csv")
 
 # Eliminate non-predictive variables
 reduceVarsData<-fullData %>% select(-url,-timedelta)
-#Are there other vars we do not need to use??
 
-#test code for pre automation
+#test code for pre markdown automation
 #params$channel<-"data_channel_is_bus"
 
 #filter by the current params channel
@@ -614,6 +618,16 @@ plot(rfImp,top = 10, main="Random Forest Model\nTop 10 Importance Plot")
 
 ### Boosted Tree Model
 
+Boosting is a general method whereby decision trees are grown
+sequentially using residuals (the differences between observed values
+and predicted values of a variable) as the response. Initial prediction
+values start at 0 for all combinations of predictors, so that the first
+set of residuals matches the observed values in our data. To mitigate
+low bias and high variance, contributions from subsequent trees are
+scaled with a shrinkage parameter, *λ*. The value of this parameter is
+generally small (0.01 or 0.001), which results in slow tree growth and
+tampers overfitting (James et al., 2021).
+
 ``` r
 # Seeing "Error in summary.connection(connection) : invalid connection"
 # if I don't re-allocate cores for parallel computing
@@ -683,9 +697,8 @@ stopCluster(cl)
 
 ## Model Comparisons
 
-Maks,model comparison needs to be automated. We will have RMSE for each
-model and need to find the lowest RMSE per channel to chose as best
-model for that channel.
+After models were fit with training data, we do predictions with testing
+data. Finally, RMSE metrics are extracted and compared
 
 ``` r
 # Predict using test data
@@ -698,12 +711,13 @@ predictLM1 <- predict(lmFit1, newdata = channelTest)
 ``` r
 # Metrics
 RMSELM1 <- postResample(predictLM1, obs = channelTest$shares)["RMSE"][[1]]
-str(RMSELM1)
+RMSELM1
 ```
 
-    ##  num 7532
+    ## [1] 7531.881
 
 ``` r
+# Store value for model comparison
 modelPerformance <- tibble(RMSE = RMSELM1, Model = "Linear regression 1")
 ```
 
@@ -761,8 +775,8 @@ selectModel
     ##   <dbl> <chr>              
     ## 1 7532. Linear regression 1
 
-Based on the output above, the Linear regression 1 model yields the
-lowest RMSE, 7531.881178.
+Based on the preceding analyses with test data, the Linear regression 1
+model yields the lowest RMSE - 7531.881178.
 
 ## References
 
