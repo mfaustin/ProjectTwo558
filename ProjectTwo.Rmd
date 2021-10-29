@@ -277,10 +277,9 @@ g + geom_point(aes(color=dayType)) +
 
 ```
 
+The bar plot below shows cumulative article publications for each day of the week, with higher bars indicating more publications. However, days with the largest number of publications are not necessarily ones with the most article shares, as seen in the subsequent box plot. 
 
 ```{r bar plot}
-## Bar plot placeholder
-
 # Subset columns to include only weekday_is_*
 weekdayData <- channelData %>% select(starts_with("weekday_is"))
 
@@ -495,7 +494,7 @@ plot(rfImp,top = 10, main="Random Forest Model\nTop 10 Importance Plot")
 
 ### Boosted Tree Model  
 
-Boosting is a general method whereby decision trees are grown sequentially using residuals (the differences between observed values and predicted values of a variable) as the response. Initial prediction values start at $0$ for all combinations of predictors, so that the first set of residuals matches the observed values in our data. To mitigate low bias and high variance, contributions from subsequent trees are scaled with a shrinkage parameter, $\lambda$. The value of this parameter is generally small (0.01 or 0.001), which results in slow tree growth and tampers overfitting [@2021]. 
+Boosting is a general method whereby decision trees are grown sequentially using residuals (the differences between observed values and predicted values of a variable) as the response. Initial prediction values start at $0$ for all combinations of predictors, so that the first set of residuals matches the observed values in our data. To mitigate low bias and high variance, contributions from subsequent trees are scaled with a shrinkage parameter, $\lambda$. The value of this parameter is generally small (0.01 or 0.001), which slows tree growth and tampers overfitting [@2021]. 
 
 ```{r train boosted tree model, cache=TRUE}
 # Seeing "Error in summary.connection(connection) : invalid connection"
