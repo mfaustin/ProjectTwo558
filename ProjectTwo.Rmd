@@ -77,14 +77,11 @@ reduceVarsData<-fullData %>% select(-url,-timedelta)
 #filter by the current params channel
 channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
 
-# Temp, will clean up
+# URL data for top ten articles in each category
 channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
 
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
-
-# Temp, will clean up
-channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
 ```
 
 ## Introduction  
@@ -207,7 +204,7 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
 
 ```
 
-Fernandes et al highlight several variables in their random forest model [@10.1007/978-3-319-23485-4_53].  The following variables from their top 11 were included in the following correlation plot with variables in () being renamed for this plot: `shares`,`kw_min_avg`,`kw_max_avg`,`LDA_03`,`self_reference_min_shares`(`srmin_shares`),`kw_avg_max`,`self_reference_avg_sharess`(`sravg_shares`),`LDA_02`,`kw_avg_min`,`LDA_01`,`n_non_stop_unique_tokens`(`n_nstop_utokens`).  
+Fernandes et al. highlight several variables in their random forest model [@10.1007/978-3-319-23485-4_53].  The following variables from their top 11 were included in the following correlation plot with variables in () being renamed for this plot: `shares`,`kw_min_avg`,`kw_max_avg`,`LDA_03`,`self_reference_min_shares`(`srmin_shares`),`kw_avg_max`,`self_reference_avg_sharess`(`sravg_shares`),`LDA_02`,`kw_avg_min`,`LDA_01`,`n_non_stop_unique_tokens`(`n_nstop_utokens`).  
 The plot shows correlation with the response variable `shares` and the other various combinations.  Larger circles indicate stronger positive (blue) or negative (red) correlation with correlation values on the lower portion of the plot.  
 
 ```{r corrplot}
@@ -399,12 +396,11 @@ Linear regression models are fit with training data by minimizing the sum of squ
   
 
 ```{r train linear regression model one, cache=TRUE}
-# Seeing "Error in summary.connection(connection) : invalid connection" after
-# previous parallel computing runs, stopCluster(cl) may not be working as expected
+# Prallel cluster setup
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-# Linear regression 
+# Linear regression with all predictors 
 lmFit1 <- train(shares ~ ., data = channelTrain,
                method = "lm",
                preProcess = c("center", "scale"),
@@ -500,8 +496,7 @@ plot(rfImp,top = 10, main="Random Forest Model\nTop 10 Importance Plot")
 Boosting is a general method whereby decision trees are grown sequentially using residuals (the differences between observed values and predicted values of a variable) as the response. Initial prediction values start at $0$ for all combinations of predictors, so that the first set of residuals matches the observed values in our data. To mitigate low bias and high variance, contributions from subsequent trees are scaled with a shrinkage parameter, $\lambda$. The value of this parameter is generally small (0.01 or 0.001), which slows tree growth and tampers overfitting [@2021]. 
 
 ```{r train boosted tree model, cache=TRUE}
-# Seeing "Error in summary.connection(connection) : invalid connection"
-# if I don't re-allocate cores for parallel computing
+# Re-allocate cores for parallel computing
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
@@ -573,8 +568,6 @@ modelPerformance <- add_row(modelPerformance, RMSE = RMSERF, Model = "Random for
 
 
 ```{r test boosted tree model}
-#summary(bestBoostedTree)
-
 # Predict using test data
 predictGBM <- predict(bestBoostedTree, newdata = channelTest)
 
