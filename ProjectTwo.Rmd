@@ -353,7 +353,7 @@ sharesBox + geom_boxplot(outlier.shape = NA) +
        title = "Distribution of article shares for each publication day") + scale_fill_brewer(palette = "Spectral")
 ```
 
-For the empirical cumulative distribution function (ECDF) below, the `dplyr` ranking function `ntile()` divides `shares` into four groups. Observations with the fewest shares are placed into group 1, those with the most shares are placed into group 4, and intermediaries reside in groups 2 and 3. The horizontal axis lists word count, and the vertical axis lists the percentage of content with that word count. A divergence of the colored lines suggests that the number of words differs in content with the fewest and most shares.     
+For the empirical cumulative distribution function (ECDF) below, the `dplyr` ranking function `ntile()` divides `shares` into four groups. Observations with the fewest shares are placed into group 1, those with the most shares are placed into group 4, and intermediaries reside in groups 2 and 3. The horizontal axis lists word count, and the vertical axis lists the percentage of content with that word count. A divergence of the colored lines suggests that the number of words differs in content with the fewest and most shares. At any given percentage of content (y-value), curves further to the right correspond to more words within the associated `shares` group. Groups with curves that are further to the left indicate fewer words in that percentage of content.    
 
 ```{r ecdf, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 # Create variable to for binning the shares
@@ -396,7 +396,7 @@ For linear regression, explanatory variables can be continuous or categorical.  
 Linear regression models are fit with training data by minimizing the sum of squared errors.  Model fitting results in a line for simple linear regression and a saddle for multiple linear regression.  
   
 
-The first linear regression model contains all predictors.  
+The first linear regression model contains predictors that encompass content keywords, sentiment and subjectivity, the length of content (the effects of which were gleaned previously from the ECDF), and link citations.  
 
 ```{r train linear regression model one, cache=TRUE}
 # Parallel cluster setup
