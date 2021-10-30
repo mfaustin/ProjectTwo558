@@ -399,19 +399,24 @@ Linear regression models are fit with training data by minimizing the sum of squ
 The first linear regression model contains all predictors.  
 
 ```{r train linear regression model one, cache=TRUE}
-# Prallel cluster setup
+# Parallel cluster setup
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-# Linear regression with all predictors 
-lmFit1 <- train(shares ~ ., data = channelTrain,
+# Linear regression with predictors that have a p-value of < 0.01 
+lmFit1 <- train(shares ~ kw_avg_avg + kw_max_avg + kw_min_avg + 
+    num_hrefs + self_reference_min_shares + global_subjectivity + 
+    num_self_hrefs + n_tokens_title + n_tokens_content + n_unique_tokens + 
+    average_token_length + kw_min_max + num_keywords + kw_max_min + abs_title_subjectivity + 
+    global_rate_positive_words, 
+    data = channelTrain,
                method = "lm",
                preProcess = c("center", "scale"),
                trControl = trainControl(method = "cv", 
                                         number = 5))
 
-
 stopCluster(cl)
+
 ```
 
 The second linear regression model contains main effects for all the predictors listed earlier in the correlation plot.  
