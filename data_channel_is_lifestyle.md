@@ -342,12 +342,16 @@ weekdayBar + labs(x = "Day", y = "Number published",
 
 ![](images/lifestyle/bar%20plot-1.png)<!-- -->
 
-The box plot below examines the day of article publication
+The boxplot below examines the day of article publication
 (Monday-Sunday) and the associated distribution of article `shares`. The
-combination of a relatively higher median on Saturday and Sunday, as
-well as a comparably tall upper whisker, suggests that articles
-published on weekends may circulate more frequently on social media than
-articles published on weekdays.
+median line indicates the center of the distribution of `shares`, and
+comparatively high medians indicate days that have relatively high
+circulation of Mashable articles in social media networks. For days in
+which the median is closer to the lower quartile (and where the upper
+whisker may be taller than the lower whisker), the distribution is
+skewed to the right. Conversely, a median that is closer to the upper
+quartile indicates a distribution that is skewed to the left. Days with
+relatively taller boxplots also have greater variability of `shares`.
 
 ``` r
 # Subset columns to include only weekday_is_*, shares,
@@ -410,7 +414,10 @@ the most shares are placed into group 4, and intermediaries reside in
 groups 2 and 3. The horizontal axis lists word count, and the vertical
 axis lists the percentage of content with that word count. A divergence
 of the colored lines suggests that the number of words differs in
-content with the fewest and most shares.
+content with the fewest and most shares. At any given percentage of
+content (y-value), curves further to the right correspond to more words
+within the associated `shares` group. Groups with curves that are
+further to the left indicate fewer words in that percentage of content.
 
 ``` r
 # Create variable to for binning the shares
@@ -464,21 +471,28 @@ Linear regression models are fit with training data by minimizing the
 sum of squared errors. Model fitting results in a line for simple linear
 regression and a saddle for multiple linear regression.
 
-The first linear regression model contains all predictors.
+The first linear regression model contains predictors that encompass
+content keywords, sentiment and subjectivity, the length of content (the
+effects of which were gleaned previously from the ECDF), and link
+citations.
 
 ``` r
-# Prallel cluster setup
+# Parallel cluster setup
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-# Linear regression with all predictors 
-lmFit1 <- train(shares ~ ., data = channelTrain,
+# Linear regression with subset of predictors (p-value < 0.1) selected after performing 
+# least squares fit on the entire set of predictors. 
+lmFit1 <- train(shares ~ kw_avg_avg + kw_max_avg + kw_min_avg + 
+    num_hrefs + self_reference_min_shares + global_subjectivity + 
+    num_self_hrefs + n_tokens_title + n_tokens_content + n_unique_tokens + 
+    average_token_length + kw_min_max + num_keywords + kw_max_min + abs_title_subjectivity + 
+    global_rate_positive_words, 
+    data = channelTrain,
                method = "lm",
                preProcess = c("center", "scale"),
                trControl = trainControl(method = "cv", 
                                         number = 5))
-
-
 stopCluster(cl)
 ```
 
@@ -705,18 +719,13 @@ lowest RMSE is presented as the winning model.
 ``` r
 # Predict using test data
 predictLM1 <- predict(lmFit1, newdata = channelTest)
-```
 
-    ## Warning in predict.lm(modelFit, newdata): prediction from a rank-deficient fit may
-    ## be misleading
-
-``` r
 # Metrics
 RMSELM1 <- postResample(predictLM1, obs = channelTest$shares)["RMSE"][[1]]
 RMSELM1
 ```
 
-    ## [1] 8503.74
+    ## [1] 8344.936
 
 ``` r
 # Store value for model comparison
@@ -771,12 +780,12 @@ selectModel
 ```
 
     ## # A tibble: 1 x 2
-    ##    RMSE Model        
-    ##   <dbl> <chr>        
-    ## 1 8416. Random forest
+    ##    RMSE Model              
+    ##   <dbl> <chr>              
+    ## 1 8345. Linear regression 1
 
-Based on the preceding analyses with test data, the Random forest model
-yields the lowest RMSE - 8415.6033789.
+Based on the preceding analyses with test data, the Linear regression 1
+model yields the lowest RMSE - 8344.9359123.
 
 ## References
 
