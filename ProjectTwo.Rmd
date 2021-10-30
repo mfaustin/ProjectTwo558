@@ -299,7 +299,8 @@ weekdayBar + labs(x = "Day", y = "Number published",
        title = "Article publications by day of week")
 ```
 
-The box plot below examines the day of article publication (Monday-Sunday) and the associated distribution of article `shares`. The combination of a relatively higher median on Saturday and Sunday, as well as a comparably tall upper whisker, suggests that articles published on weekends may circulate more frequently on social media than articles published on weekdays.       
+The boxplot below examines the day of article publication (Monday-Sunday) and the associated distribution of article `shares`. The median line indicates the center of the distribution of `shares`, and comparatively high medians indicate days that have relatively high circulation of Mashable articles in social media networks. For days in which the median is closer to the lower quartile (and where the upper whisker may be taller than the lower whisker), the distribution is skewed to the right. Conversely, a median that is closer to the upper quartile indicates a distribution that is skewed to the left. Days with relatively taller boxplots also have greater variability of `shares`.    
+     
 
 ```{r boxpot preparation, echo=TRUE, eval=TRUE, message=FALSE, results='hide'}
 # Subset columns to include only weekday_is_*, shares,
