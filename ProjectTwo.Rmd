@@ -425,11 +425,7 @@ tempLM <- train(shares ~ .,
                                         number = 5))
 
 stopCluster(cl)
-summary(lmFit1)
 
-
-
-summary(tempLM)
 ```
 
 The second linear regression model contains main effects for all the predictors listed earlier in the correlation plot.  
