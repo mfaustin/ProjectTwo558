@@ -551,8 +551,6 @@ lmFit2 <- train(shares ~ kw_min_avg +
 
 
 stopCluster(cl)
-
-lmFit2
 ```
 
 ### Random Forest Model
@@ -771,7 +769,7 @@ RMSELM2<-postResample(predictLM2, channelTest$shares)["RMSE"][[1]]
 RMSELM2
 ```
 
-    ## [1] 12575.35
+    ## [1] 8450.339
 
 ``` r
 modelPerformance <- add_row(modelPerformance, RMSE = RMSELM2, Model = "Linear regression 2")

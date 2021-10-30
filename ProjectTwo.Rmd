@@ -421,7 +421,7 @@ stopCluster(cl)
 
 The second linear regression model contains main effects for most of the predictors listed earlier in the correlation plot.  If variables had more than .50 pairwise correlation in any channel, one variable of that pair was excluded.  Excluded variables were: `self_reference_min_shares`, `kw_avg_max`, and `LDA_01`.  
 
-```{r train linear regression model two, cache=TRUE,eval=FALSE}
+```{r train linear regression model two, cache=TRUE}
 
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
@@ -439,7 +439,6 @@ lmFit2 <- train(shares ~ kw_min_avg +
 
 stopCluster(cl)
 
-lmFit2
 
 ```
 ### Random Forest Model  
