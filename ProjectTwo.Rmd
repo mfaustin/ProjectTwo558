@@ -403,7 +403,8 @@ The first linear regression model contains all predictors.
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-# Linear regression with predictors that have a p-value of < 0.01 
+# Linear regression with predictors selected from measures of logworth >= 1 
+# (p-value < 0.1). 
 lmFit1 <- train(shares ~ kw_avg_avg + kw_max_avg + kw_min_avg + 
     num_hrefs + self_reference_min_shares + global_subjectivity + 
     num_self_hrefs + n_tokens_title + n_tokens_content + n_unique_tokens + 
@@ -415,8 +416,20 @@ lmFit1 <- train(shares ~ kw_avg_avg + kw_max_avg + kw_min_avg +
                trControl = trainControl(method = "cv", 
                                         number = 5))
 
-stopCluster(cl)
 
+tempLM <- train(shares ~ ., 
+    data = channelTrain,
+               method = "lm",
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", 
+                                        number = 5))
+
+stopCluster(cl)
+summary(lmFit1)
+
+
+
+summary(tempLM)
 ```
 
 The second linear regression model contains main effects for all the predictors listed earlier in the correlation plot.  
