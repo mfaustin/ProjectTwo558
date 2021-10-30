@@ -34,14 +34,11 @@ reduceVarsData<-fullData %>% select(-url,-timedelta)
 #filter by the current params channel
 channelData<-reduceVarsData %>% filter(eval(as.name(params$channel))==1) 
 
-# Temp, will clean up
+# URL data for top ten articles in each category
 channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
 
 ###Can now drop the data channel variables 
 channelData<-channelData %>% select(-starts_with("data_channel"))
-
-# Temp, will clean up
-channelDataURL <- fullData %>% filter(eval(as.name(params$channel))==1)
 ```
 
 ## Introduction
@@ -225,10 +222,10 @@ g + geom_histogram(binwidth=12000,color = "brown", fill = "green",
 
 ![](images/world/histogram%20of%20shares-1.png)<!-- -->
 
-Fernandes et al highlight several variables in their random forest model
-(Fernandes et al., 2015). The following variables from their top 11 were
-included in the following correlation plot with variables in () being
-renamed for this plot:
+Fernandes et al. highlight several variables in their random forest
+model (Fernandes et al., 2015). The following variables from their top
+11 were included in the following correlation plot with variables in ()
+being renamed for this plot:
 `shares`,`kw_min_avg`,`kw_max_avg`,`LDA_03`,`self_reference_min_shares`(`srmin_shares`),`kw_avg_max`,`self_reference_avg_sharess`(`sravg_shares`),`LDA_02`,`kw_avg_min`,`LDA_01`,`n_non_stop_unique_tokens`(`n_nstop_utokens`).  
 The plot shows correlation with the response variable `shares` and the
 other various combinations. Larger circles indicate stronger positive
@@ -318,9 +315,12 @@ g + geom_point(aes(color=dayType)) +
 
 ![](images/world/scatterplots%20-2.png)<!-- -->
 
-``` r
-## Bar plot placeholder
+The bar plot below shows cumulative article publications for each day of
+the week, with higher bars indicating more publications. However, days
+with the largest number of publications are not necessarily ones with
+the most article shares, as seen in the subsequent box plot.
 
+``` r
 # Subset columns to include only weekday_is_*
 weekdayData <- channelData %>% select(starts_with("weekday_is"))
 
@@ -425,8 +425,6 @@ avgWordHisto + stat_ecdf(geom = "step", aes(color = as.character(shareQuantile))
   scale_colour_brewer(palette = "Spectral", name = "Article shares \n(group rank)")
 ```
 
-    ## Warning: Removed 97 rows containing non-finite values (stat_ecdf).
-
 ![](images/world/ecdf-1.png)<!-- -->
 
 ## Modeling
@@ -466,13 +464,14 @@ Linear regression models are fit with training data by minimizing the
 sum of squared errors. Model fitting results in a line for simple linear
 regression and a saddle for multiple linear regression.
 
+The first linear regression model contains all predictors.
+
 ``` r
-# Seeing "Error in summary.connection(connection) : invalid connection" after
-# previous parallel computing runs, stopCluster(cl) may not be working as expected
+# Prallel cluster setup
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-# Linear regression 
+# Linear regression with all predictors 
 lmFit1 <- train(shares ~ ., data = channelTrain,
                method = "lm",
                preProcess = c("center", "scale"),
@@ -482,6 +481,9 @@ lmFit1 <- train(shares ~ ., data = channelTrain,
 
 stopCluster(cl)
 ```
+
+The second linear regression model contains main effects for all the
+predictors listed earlier in the correlation plot.
 
 ``` r
 cl <- makePSOCKcluster(6)
@@ -625,12 +627,11 @@ values start at 0 for all combinations of predictors, so that the first
 set of residuals matches the observed values in our data. To mitigate
 low bias and high variance, contributions from subsequent trees are
 scaled with a shrinkage parameter, *λ*. The value of this parameter is
-generally small (0.01 or 0.001), which results in slow tree growth and
-tampers overfitting (James et al., 2021).
+generally small (0.01 or 0.001), which slows tree growth and tampers
+overfitting (James et al., 2021).
 
 ``` r
-# Seeing "Error in summary.connection(connection) : invalid connection"
-# if I don't re-allocate cores for parallel computing
+# Re-allocate cores for parallel computing
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
@@ -748,8 +749,6 @@ modelPerformance <- add_row(modelPerformance, RMSE = RMSERF, Model = "Random for
 ```
 
 ``` r
-#summary(bestBoostedTree)
-
 # Predict using test data
 predictGBM <- predict(bestBoostedTree, newdata = channelTest)
 
