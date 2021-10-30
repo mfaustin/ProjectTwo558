@@ -8,7 +8,7 @@ params:
 ---
 
 
-```{r channel setups, include=FALSE}
+```{r rmarkdown automation}
 
 ##For markdown automation need a different 
 ##  image and cache folder 
@@ -419,20 +419,17 @@ stopCluster(cl)
 
 ```
 
-The second linear regression model contains main effects for all the predictors listed earlier in the correlation plot.  
+The second linear regression model contains main effects for most of the predictors listed earlier in the correlation plot.  If variables had more than .50 pairwise correlation in any channel, one variable of that pair was excluded.  Excluded variables were: `self_reference_min_shares`, `kw_avg_max`, and `LDA_01`.  
 
 ```{r train linear regression model two, cache=TRUE,eval=FALSE}
 
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-# Linear regression 
-# Using same vars as in corrplot 
-# See corrplot for why these were chosen
 lmFit2 <- train(shares ~ kw_min_avg +
-        kw_max_avg + LDA_03 + self_reference_min_shares +
-        kw_avg_max + self_reference_avg_sharess + LDA_02 +
-        kw_avg_min + LDA_01 + n_non_stop_unique_tokens, 
+        kw_max_avg + LDA_03 +  
+        self_reference_avg_sharess + LDA_02 +
+        kw_avg_min + n_non_stop_unique_tokens, 
                data = channelTrain,
                method = "lm",
                preProcess = c("center", "scale"),
@@ -576,7 +573,7 @@ modelPerformance <- add_row(modelPerformance, RMSE = RMSERF, Model = "Random for
 ```
 
 
-```{r test boosted tree model}
+```{r test boosted tree model,cache=TRUE}
 # Predict using test data
 predictGBM <- predict(bestBoostedTree, newdata = channelTest)
 

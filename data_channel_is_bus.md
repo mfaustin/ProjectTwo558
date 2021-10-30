@@ -17,6 +17,39 @@ Due 10/31/2021
 -   [Model Comparisons](#model-comparisons)
 -   [References](#references)
 
+``` r
+##For markdown automation need a different 
+##  image and cache folder 
+##  for each of the 6 channels so that results
+##    from different channels don't overwrite each other
+##Also setting up currentChannel variable 
+if (params$channel=="data_channel_is_bus") {
+  knitr::opts_chunk$set(fig.path = "images/bus/",
+                        cache.path = "cache/bus/")
+  currentChannel<-"Business"
+} else if (params$channel=="data_channel_is_entertainment") {
+  knitr::opts_chunk$set(fig.path = "images/entertainment/",
+                        cache.path="cache/entertainment/")
+  currentChannel<-"Entertainment"
+} else if (params$channel=="data_channel_is_lifestyle") {
+  knitr::opts_chunk$set(fig.path = "images/lifestyle/",
+                        cache.path = "cache/lifestyle/")
+  currentChannel<-"Lifestyle"
+} else if (params$channel=="data_channel_is_socmed") {
+  knitr::opts_chunk$set(fig.path = "images/socmed/",
+                        cache.path = "cache/socmed/")
+  currentChannel<-"Social Media"
+} else if (params$channel=="data_channel_is_tech") {
+  knitr::opts_chunk$set(fig.path = "images/tech/",
+                        cache.path = "cache/tech/")
+  currentChannel<-"Tech"
+} else if (params$channel=="data_channel_is_world") {
+  knitr::opts_chunk$set(fig.path = "images/world/",
+                        cache.path = "cache/world/")
+  currentChannel<-"World"
+} 
+```
+
 ## Data Import
 
 Data was imported first to allow for a more automated introduction.
@@ -496,20 +529,20 @@ lmFit1 <- train(shares ~ kw_avg_avg + kw_max_avg + kw_min_avg +
 stopCluster(cl)
 ```
 
-The second linear regression model contains main effects for all the
-predictors listed earlier in the correlation plot.
+The second linear regression model contains main effects for most of the
+predictors listed earlier in the correlation plot. If variables had more
+than .50 pairwise correlation in any channel, one variable of that pair
+was excluded. Excluded variables were: `self_reference_min_shares`,
+`kw_avg_max`, and `LDA_01`.
 
 ``` r
 cl <- makePSOCKcluster(6)
 registerDoParallel(cl)
 
-# Linear regression 
-# Using same vars as in corrplot 
-# See corrplot for why these were chosen
 lmFit2 <- train(shares ~ kw_min_avg +
-        kw_max_avg + LDA_03 + self_reference_min_shares +
-        kw_avg_max + self_reference_avg_sharess + LDA_02 +
-        kw_avg_min + LDA_01 + n_non_stop_unique_tokens, 
+        kw_max_avg + LDA_03 +  
+        self_reference_avg_sharess + LDA_02 +
+        kw_avg_min + n_non_stop_unique_tokens, 
                data = channelTrain,
                method = "lm",
                preProcess = c("center", "scale"),
@@ -738,7 +771,7 @@ RMSELM2<-postResample(predictLM2, channelTest$shares)["RMSE"][[1]]
 RMSELM2
 ```
 
-    ## [1] 9838.997
+    ## [1] 51008.13
 
 ``` r
 modelPerformance <- add_row(modelPerformance, RMSE = RMSELM2, Model = "Linear regression 2")
