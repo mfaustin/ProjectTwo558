@@ -36,17 +36,17 @@ project and/or create the linked channel documents.
 
 ## Analyses by Channel  
 
-[Business articles is available here](data_channel_is_bus.html)  
+[Business articles is available here](data_channel_is_bus.md)  
 
-[Entertainment articles is available here](data_channel_is_entertainment.html)   
+[Entertainment articles is available here](data_channel_is_entertainment.md)   
   
-[Lifestyle articles is available here](data_channel_is_lifestyle.html)  
+[Lifestyle articles is available here](data_channel_is_lifestyle.md)  
 
-[Social Media articles is available here](data_channel_is_socmed.html)  
+[Social Media articles is available here](data_channel_is_socmed.md)  
 
-[Tech articles is available here](data_channel_is_tech.html)  
+[Tech articles is available here](data_channel_is_tech.md)  
 
-[World articles is available here](data_channel_is_world.html)  
+[World articles is available here](data_channel_is_world.md)  
 
 
 ## Render Code Used to Create Analyses  
